@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="bg-dark-panel text-white min-h-screen flex items-center justify-center">
+    <div class="text-center">
+        <h1 class="text-6xl font-bold mb-4">JOSS <span class="text-yellow-400">★</span> LAUNDRY</h1>
+        <p class="text-xl text-gray-300 mb-8">Bersih, Cepat, Wangi. Antar Jemput Gratis!</p>
+        <div class="space-x-4">
+            <a href="{% url 'login' %}" class="bg-brand-red px-8 py-3 rounded-lg font-semibold hover:bg-red-700">Login</a>
+            <a href="{% url 'register' %}" class="bg-transparent border border-gray-400 px-8 py-3 rounded-lg font-semibold hover:border-white">Register as Customer</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
