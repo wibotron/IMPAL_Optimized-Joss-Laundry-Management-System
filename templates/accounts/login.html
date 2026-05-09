@@ -2,7 +2,6 @@
 {% block title %}Login{% endblock %}
 {% block content %}
 <div class="flex min-h-screen">
-    <!-- Left side: role cards (UI only) -->
     <div class="hidden md:flex w-1/2 bg-dark-panel flex-col items-center justify-center p-12 text-white">
         <div class="text-center mb-12">
             <h1 class="text-5xl font-bold">JOSS ★ LAUNDRY</h1>
@@ -23,8 +22,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Right side: login form -->
     <div class="w-full md:w-1/2 bg-white flex flex-col justify-center p-8 lg:p-20">
         <div class="max-w-md mx-auto w-full">
             <div class="bg-brand-red text-white text-xs font-bold px-3 py-1 rounded inline-block mb-4">Customer / Staff</div>
@@ -43,7 +40,7 @@
                 <button type="submit" class="w-full bg-brand-red text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Login →</button>
             </form>
             <div class="mt-8 text-center text-gray-400 text-sm flex items-center justify-center gap-2 before:h-px before:w-1/4 before:bg-gray-200 after:h-px after:w-1/4 after:bg-gray-200">atau</div>
-            <p class="mt-6 text-center text-sm">Belum punya akun? <a href="{% url 'register' %}" class="text-brand-red font-bold hover:underline">Daftar sebagai Customer</a></p>
+            <p class="mt-6 text-center text-sm">Belum punya akun? <a href="{% url 'accounts:register' %}" class="text-brand-red font-bold hover:underline">Daftar sebagai Customer</a></p>
         </div>
     </div>
 </div>

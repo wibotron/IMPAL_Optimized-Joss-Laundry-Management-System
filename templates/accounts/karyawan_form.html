@@ -11,14 +11,19 @@
                 <label class="block text-sm font-bold mb-1">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}<p class="text-red-500 text-xs">{{ field.errors.0 }}</p>{% endif %}
+                {% if field.help_text %}<p class="text-gray-500 text-xs">{{ field.help_text }}</p>{% endif %}
             </div>
             {% endfor %}
             <div class="flex gap-3">
                 <button type="submit" class="bg-brand-red text-white px-4 py-2 rounded-lg">Simpan</button>
-                <a href="{% url 'employee_list' %}" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</a>
+                <a href="{% url 'accounts:karyawan_list' %}" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</a>
             </div>
         </form>
     </div>
 </div>
-<script>document.querySelectorAll('input, textarea, select').forEach(el=>{if(el.type!=='submit')el.classList.add('w-full','px-3','py-2','border','border-gray-300','rounded-lg','focus:ring-2','focus:ring-brand-red')});</script>
+<script>
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        if (el.type !== 'submit' && el.type !== 'checkbox') el.classList.add('w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-lg', 'focus:ring-2', 'focus:ring-brand-red');
+    });
+</script>
 {% endblock %}

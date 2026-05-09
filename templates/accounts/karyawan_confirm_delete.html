@@ -5,11 +5,11 @@
     <div class="bg-white rounded-xl shadow p-6">
         <div class="text-5xl mb-4">⚠️</div>
         <h2 class="text-2xl font-bold mb-2">Konfirmasi Hapus</h2>
-        <p class="mb-6">Yakin hapus <strong>{{ employee.username }}</strong>?</p>
+        <p class="mb-6">Yakin hapus <strong>{{ karyawan.full_name }}</strong>?</p>
         <form method="post">
             {% csrf_token %}
             <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg mr-2">Ya, Hapus</button>
-            <a href="{% url 'employee_list' %}" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</a>
+            <a href="{% url 'accounts:karyawan_list' %}" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</a>
         </form>
     </div>
 </div>

@@ -2,7 +2,7 @@
 {% block title %}Customer Dashboard{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold">Halo, {{ user.first_name|default:user.username }}! 👋</h1>
+    <h1 class="text-3xl font-bold">Halo, {{ user.full_name }}! 👋</h1>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <a href="#" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg"><div class="text-4xl text-brand-red">📦</div><h3 class="font-bold mt-2">Pesan Laundry</h3></a>
         <a href="#" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg"><div class="text-4xl text-brand-red">📊</div><h3 class="font-bold mt-2">Status Progress</h3></a>
