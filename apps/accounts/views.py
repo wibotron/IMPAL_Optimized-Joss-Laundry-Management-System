@@ -8,7 +8,7 @@ from .models import User
 
 def landing_page(request):
     """Halaman landing"""
-    return render(request, 'accounts/landing.html')
+    return render(request, 'landing.html')
 
 def register_customer(request):
     """Registrasi hanya untuk customer"""

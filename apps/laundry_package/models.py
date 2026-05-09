@@ -50,6 +50,15 @@ class LaundryPackage(models.Model):
     )
     objects = LaundryPackageManager()
 
+    
+    @property
+    def is_valid(self):
+        """Cek apakah paket aktif dan dalam periode berlaku"""
+        today = timezone.now().date()
+        start_ok = (self.start_date is None or self.start_date <= today)
+        end_ok = (self.end_date is None or self.end_date >= today)
+        return self.is_active and start_ok and end_ok
+
     class Meta:
         ordering = ['price_per_kg']
         verbose_name = "Paket Laundry"

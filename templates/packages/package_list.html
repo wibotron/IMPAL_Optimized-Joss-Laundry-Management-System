@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Daftar Paket Laundry{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Paket Laundry</h1>
+        {% if user.is_owner %}
+        <a href="{% url 'packages:package_create' %}" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">+ Tambah Paket</a>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for package in packages %}
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-gray-800">{{ package.name }}</h2>
+                <div class="mt-2 text-3xl font-bold text-brand-red">Rp {{ package.price_per_kg|floatformat:0 }}<span class="text-base font-normal text-gray-500">/kg</span></div>
+                <p class="mt-2 text-gray-600">{{ package.description|truncatewords:20 }}</p>
+                <div class="mt-4 flex justify-between items-center text-sm text-gray-500">
+                    <span>⏱️ Estimasi: {{ package.estimated_days }} hari</span>
+                    {% if package.start_date or package.end_date %}
+                    <span>📅 {{ package.start_date|default:"mulai"|date:"d/m/Y" }} - {{ package.end_date|default:"selesai"|date:"d/m/Y" }}</span>
+                    {% endif %}
+                </div>
+                <div class="mt-4">
+                    {% if not package.is_valid %}
+                    <span class="text-xs text-red-500">⚠️ Tidak berlaku saat ini</span>
+                    {% endif %}
+                </div>
+                {% if user.is_owner %}
+                <div class="mt-4 flex justify-end space-x-3">
+                    <a href="{% url 'packages:package_update' package.pk %}" class="text-blue-600 hover:underline">Edit</a>
+                    <a href="{% url 'packages:package_delete' package.pk %}" class="text-red-600 hover:underline">Hapus</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="col-span-full text-center text-gray-500 py-8">Belum ada paket laundry.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

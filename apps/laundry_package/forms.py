@@ -10,7 +10,7 @@ class PackageForm(forms.ModelForm):
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'price_per_kg': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'price_per_kg': forms.NumberInput(attrs={'class': 'form-control', 'step': '1000'}),
             'estimated_days': forms.NumberInput(attrs={'class': 'form-control'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -18,7 +18,7 @@ class PackageForm(forms.ModelForm):
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-    def clean_date(self):
+    def clean(self): 
         cleaned_data = super().clean()
         start_date = cleaned_data.get('start_date')
         end_date = cleaned_data.get('end_date')
