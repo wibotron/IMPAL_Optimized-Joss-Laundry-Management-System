@@ -27,12 +27,12 @@ class User(AbstractUser):
     )
 
     phone_regex = RegexValidator(
-        regex=r'^(?:\+62|0)8[1-9][0-9]{7,10}$',
-        message="Nomor telepon harus format Indonesia (contoh: 08123456789 atau +628123456789)."
+        regex=r'^(?:\+62|0)8[1-9][0-9]{8,11}$',
+        message="Nomor telepon harus format Indonesia murni angka (contoh: 08123456789 atau +628123456789)."
     )
     phone_number = models.CharField(
         validators=[phone_regex], 
-        max_length=15, 
+        max_length=20, 
         unique=True,
         verbose_name="Nomor Telepon"
     )
@@ -51,6 +51,11 @@ class User(AbstractUser):
 
     def is_owner(self):
         return self.role == self.OWNER
+    
+    def save(self, *args, **kwargs):
+        if self.phone_number:
+            self.phone_number = self.phone_number.replace(" ", "").replace("-", "")
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"

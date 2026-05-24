@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}Manajemen Order - JOSS Laundry{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Daftar Pesanan</h1>
+        <a href="{% url 'orders:order_create_walkin' %}" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">+ Order Walk-in</a>
+    </div>
+
+    <!-- Filter Form -->
+    <form method="get" class="bg-white p-4 rounded-lg shadow mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input type="text" name="search" placeholder="Cari kode nota / nama customer" value="{{ search_query }}" class="px-3 py-2 border rounded-lg focus:ring-brand-red">
+            <select name="progress" class="px-3 py-2 border rounded-lg">
+                <option value="">Semua Progress</option>
+                {% for value, label in progress_choices %}
+                    <option value="{{ value }}" {% if selected_progress == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <select name="payment" class="px-3 py-2 border rounded-lg">
+                <option value="">Semua Status Bayar</option>
+                {% for value, label in payment_choices %}
+                    <option value="{{ value }}" {% if selected_payment == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">Filter</button>
+        </div>
+    </form>
+
+    <!-- Orders Table -->
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode Nota</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. HP</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paket</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Berat (kg)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status Bayar</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Feedback</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nota PDF</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for order in orders %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 font-mono text-sm">{{ order.kode_nota }}</td>
+                    <td class="px-6 py-4">{{ order.nama_customer }}</td>
+                    <td class="px-6 py-4">{{ order.nomor_hp }}</td>
+                    <td class="px-6 py-4">{{ order.paket.name }}</td>
+                    <td class="px-6 py-4">{{ order.berat }}</td>
+                    <td class="px-6 py-4">Rp {{ order.total_harga|floatformat:0 }}</td>
+
+                    <!-- Progress dropdown update -->
+                    <td class="px-6 py-4">
+                        <form method="post" action="{% url 'orders:update_progress' order.id %}" class="flex gap-1">
+                            {% csrf_token %}
+                            <select name="progress_status" class="text-sm border rounded px-2 py-1">
+                                {% for value, label in progress_choices %}
+                                    <option value="{{ value }}" {% if order.progress_status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600">Update</button>
+                        </form>
+                    </td>
+
+                    <!-- Status Bayar -->
+                    <td class="px-6 py-4">
+                        {% if order.payment_status == 'PAID' %}
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Lunas</span>
+                        {% else %}
+                            <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Belum Bayar</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Feedback & status balasan -->
+                    <td class="px-6 py-4">
+                        {% if order.feedback %}
+                            {% if order.feedback.reply %}
+                                <span class="text-green-600 text-sm">✅ Sudah dibalas</span><br>
+                            {% else %}
+                                <span class="text-orange-500 text-sm">⏳ Belum dibalas</span><br>
+                            {% endif %}
+                            <a href="{% url 'orders:reply_feedback' order.feedback.id %}" class="text-blue-600 text-sm hover:underline">Lihat & Balas</a>
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Nota PDF (hanya jika lunas) -->
+                    <td class="px-6 py-4">
+                        {% if order.payment_status == 'PAID' %}
+                            {% if order.nota_pdf %}
+                                <a href="{% url 'orders:karyawan_download_nota' order.id %}" class="text-brand-red hover:underline">📄 Download</a>
+                            {% else %}
+                                <a href="{% url 'orders:regenerate_nota' order.id %}" class="text-orange-500 hover:underline">⚠️ Generate Ulang</a>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Tombol Konfirmasi Bayar khusus untuk status SELESAI & UNPAID -->
+                    <td class="px-6 py-4">
+                        {% if order.progress_status == 'SELESAI' and order.payment_status == 'UNPAID' %}
+                            <a href="{% url 'orders:confirm_payment' order.id %}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Konfirmasi Bayar</a>
+                        {% else %}
+                            <span class="text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="11" class="text-center py-8 text-gray-500">Belum ada pesanan.{% for _ in '' %}   {% endfor %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Auto-open WhatsApp jika wa_link ada di URL -->
+<script>
+    // Cek parameter wa_link di URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const waLink = urlParams.get('wa_link');
+    if (waLink) {
+        // Hapus parameter wa_link dari URL agar tidak terus muncul saat refresh
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+        
+        // Konfirmasi untuk membuka WhatsApp
+        if (confirm("Status telah diubah menjadi SELESAI. Kirim notifikasi WhatsApp ke customer sekarang?")) {
+            window.open(waLink, '_blank');
+        }
+    }
+</script>
+{% endblock %}

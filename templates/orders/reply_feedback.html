@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Balas Feedback{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow p-6">
+        <h1 class="text-2xl font-bold mb-4">Balas Feedback Customer</h1>
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <p><strong>Order:</strong> {{ feedback.order.kode_nota }}</p>
+            <p><strong>Customer:</strong> {{ feedback.order.nama_customer }} ({{ feedback.order.nomor_hp }})</p>
+            <p><strong>Rating:</strong> 
+                {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= feedback.rating %}⭐{% else %}☆{% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Feedback:</strong> {{ feedback.teks }}</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Balasan Anda</label>
+                {{ form.reply }}
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">Simpan Balasan</button>
+                <a href="{% url 'orders:order_list_karyawan' %}" class="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400">Kembali</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.querySelector('textarea').classList.add('w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-lg', 'focus:ring-2', 'focus:ring-brand-red');
+</script>
+{% endblock %}

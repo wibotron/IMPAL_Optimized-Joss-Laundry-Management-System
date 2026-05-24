@@ -5,7 +5,7 @@ app_name = 'accounts'
 
 urlpatterns = [
     # Landing & autentikasi
-    path('', views.landing_page, name='landing'),
+    # path('', views.landing_page, name='landing'),
     path('register/', views.register_customer, name='register'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),

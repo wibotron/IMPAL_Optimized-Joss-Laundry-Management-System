@@ -28,8 +28,8 @@ class PackageForm(forms.ModelForm):
     
     def clean_name(self):
         name = self.cleaned_data.get('name')
-        if LaundryPackage.objects.filter(name=name).exists():
-            if self.instance.pk and self.instance.name == name:
-                return name
-            raise forms.ValidationError("Nama paket sudah digunakan.")
+        if name:
+            name = name.strip()
+        if LaundryPackage.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Nama paket sudah digunakan (tidak peka huruf besar/kecil).")
         return name

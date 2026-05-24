@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CustomerRegistrationForm, EmployeeCreationForm, EmployeeChangeForm
 from .decorators import customer_required, karyawan_required, owner_required
 from .models import User
+from .forms import LoginForm  # tambahkan di bagian atas
 
 def landing_page(request):
     """Halaman landing"""
@@ -38,22 +39,23 @@ def login_view(request):
         return redirect('accounts:dashboard')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
             messages.success(request, f'Selamat datang kembali, {user.full_name}!')
             return redirect('accounts:dashboard')
         else:
             messages.error(request, 'Username atau password salah.')
+    else:
+        form = LoginForm()
     
-    return render(request, 'accounts/login.html')
+    return render(request, 'accounts/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
     messages.info(request, 'Anda telah logout.')
-    return redirect('accounts:landing')
+    return redirect('landing')
 
 @login_required
 def dashboard_redirect(request):

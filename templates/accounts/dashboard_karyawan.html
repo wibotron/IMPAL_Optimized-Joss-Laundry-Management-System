@@ -3,13 +3,32 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold">Dashboard Karyawan</h1>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <a href="#" class="bg-white p-6 rounded-xl shadow text-center"><div class="text-4xl text-brand-red">🛒</div><h3 class="font-bold">Pesanan Walk-in</h3></a>
-        <a href="#" class="bg-white p-6 rounded-xl shadow text-center"><div class="text-4xl text-brand-red">👁️</div><h3 class="font-bold">Lihat Order</h3></a>
-        <a href="#" class="bg-white p-6 rounded-xl shadow text-center"><div class="text-4xl text-brand-red">💰</div><h3 class="font-bold">Update Payment</h3></a>
-        <a href="#" class="bg-white p-6 rounded-xl shadow text-center"><div class="text-4xl text-brand-red">⚙️</div><h3 class="font-bold">Update Progress</h3></a>
-        <a href="#" class="bg-white p-6 rounded-xl shadow text-center"><div class="text-4xl text-brand-red">📦</div><h3 class="font-bold">Stok Bahan Baku</h3></a>
-        <a href="#" class="bg-white p-6 rounded-xl shadow text-center"><div class="text-4xl text-brand-red">💬</div><h3 class="font-bold">Respons Feedback</h3></a>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <a href="{% url 'orders:order_create_walkin' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
+            <div class="text-4xl text-brand-red">🛒</div>
+            <h3 class="font-bold">Pesanan Walk-in</h3>
+            <p class="text-sm text-gray-500">Input order baru</p>
+        </a>
+        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
+            <div class="text-4xl text-brand-red">👁️</div>
+            <h3 class="font-bold">Lihat Order</h3>
+            <p class="text-sm text-gray-500">Kelola semua pesanan</p>
+        </a>
+        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
+            <div class="text-4xl text-brand-red">💰</div>
+            <h3 class="font-bold">Update Payment</h3>
+            <p class="text-sm text-gray-500">Konfirmasi pembayaran</p>
+        </a>
+        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
+            <div class="text-4xl text-brand-red">⚙️</div>
+            <h3 class="font-bold">Update Progress</h3>
+            <p class="text-sm text-gray-500">Ubah status cucian</p>
+        </a>
+        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
+            <div class="text-4xl text-brand-red">💬</div>
+            <h3 class="font-bold">Respons Feedback</h3>
+            <p class="text-sm text-gray-500">Balas pelanggan</p>
+        </a>
     </div>
 </div>
 {% endblock %}

@@ -19,7 +19,7 @@
                 <div class="mt-4 flex justify-between items-center text-sm text-gray-500">
                     <span>⏱️ Estimasi: {{ package.estimated_days }} hari</span>
                     {% if package.start_date or package.end_date %}
-                    <span>📅 {{ package.start_date|default:"mulai"|date:"d/m/Y" }} - {{ package.end_date|default:"selesai"|date:"d/m/Y" }}</span>
+                    <span>📅 {{ package.start_date|date:"d/m/Y"|default:"mulai" }} - {{ package.end_date|date:"d/m/Y"|default:"selesai" }}</span>
                     {% endif %}
                 </div>
                 <div class="mt-4">

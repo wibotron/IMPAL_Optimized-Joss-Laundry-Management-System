@@ -20,11 +20,16 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
-from django.views.generic import TemplateView 
+from django.views.generic import TemplateView
+from .views import landing_page
+
 urlpatterns = [
+    path('', landing_page, name='landing'),
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls')), 
     path('packages/', include('apps.laundry_package.urls')),
+    path('orders/', include('apps.orders.urls')),
+    path('reports/', include('apps.reports.urls')),
     # path('', TemplateView.as_view(template_name='landing.html'), name='landing')
 ]
 

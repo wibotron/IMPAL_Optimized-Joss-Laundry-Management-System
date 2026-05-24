@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.accounts",
     "apps.laundry_package",
+    "apps.orders",
+    "apps.reports",
 ]
 
 MIDDLEWARE = [

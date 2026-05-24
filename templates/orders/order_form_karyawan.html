@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Input Order Walk-in{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">Input Pesanan Walk-in</h1>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-gray-700 mb-1">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<p class="text-red-500 text-xs mt-1">{{ field.errors.0 }}</p>{% endif %}
+                {% if field.help_text %}<p class="text-gray-500 text-xs mt-1">{{ field.help_text }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">Simpan & Kirim WA</button>
+                <a href="{% url 'orders:order_list_karyawan' %}" class="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400">Batal</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.classList.add('w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-lg', 'focus:ring-2', 'focus:ring-brand-red');
+    });
+</script>
+{% endblock %}

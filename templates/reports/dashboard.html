@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Business Reports - JOSS Laundry{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <h1 class="text-3xl font-bold mb-4 md:mb-0">📊 Business Reports</h1>
+        <form method="get" class="flex flex-wrap gap-2">
+            <input type="date" name="start_date" value="{{ start_date }}" class="px-3 py-2 border rounded-lg">
+            <span class="self-center">—</span>
+            <input type="date" name="end_date" value="{{ end_date }}" class="px-3 py-2 border rounded-lg">
+            <button type="submit" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">Filter</button>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow p-6 text-center">
+            <div class="text-3xl mb-2">💰</div>
+            <div class="text-2xl font-bold text-gray-800">Rp {{ financial.total_omset|floatformat:0 }}</div>
+            <div class="text-sm text-gray-500">Total Omset (Gross)</div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 text-center">
+            <div class="text-3xl mb-2">💵</div>
+            <div class="text-2xl font-bold text-green-600">Rp {{ financial.cash_received|floatformat:0 }}</div>
+            <div class="text-sm text-gray-500">Uang Riil Diterima (PAID)</div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-6 text-center">
+            <div class="text-3xl mb-2">📉</div>
+            <div class="text-2xl font-bold text-red-600">Rp {{ financial.piutang|floatformat:0 }}</div>
+            <div class="text-sm text-gray-500">Piutang Tertahan (UNPAID)</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow p-4">
+            <h2 class="text-xl font-semibold mb-4">📈 Tren Pendapatan Harian (PAID)</h2>
+            <canvas id="revenueChart" height="200"></canvas>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4">
+            <h2 class="text-xl font-semibold mb-4">🏷️ Top Laundry Packages</h2>
+            <canvas id="packageChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">⭐ Kepuasan Pelanggan</h2>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="text-center">
+                <div class="text-4xl font-bold text-yellow-500">{{ sentiment.avg_rating }}</div>
+                <div class="text-sm text-gray-500">Rata-rata Rating</div>
+            </div>
+            <div class="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
+                <div id="sentiment-progress-bar" class="h-full bg-green-500" style="--progress-width: {{ sentiment.positive_percentage|default:0|floatformat:0 }}%;"></div>
+            </div>
+            <div class="flex gap-4 text-sm">
+                <span><span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span> Positif (4-5): {{ sentiment.positive }}</span>
+                <span><span class="inline-block w-3 h-3 bg-yellow-500 rounded-full"></span> Netral (3): {{ sentiment.neutral }}</span>
+                <span><span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> Negatif (1-2): {{ sentiment.negative }}</span>
+            </div>
+        </div>
+        <canvas id="sentimentBarChart" height="100" class="mt-4"></canvas>
+    </div>
+
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-semibold">📝 Evaluasi: Feedback Kritik Terbaru (Rating 1-3)</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode Nota</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pelanggan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Feedback</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status Order</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for fb in critical_feedbacks %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-mono text-sm">{{ fb.kode_nota }}</td>
+                        <td class="px-6 py-4">{{ fb.nama_customer }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full {% if fb.rating <= 2 %}bg-red-100 text-red-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ fb.rating }}/5
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 max-w-md">{{ fb.teks|truncatewords:20 }}</td>
+                        <td class="px-6 py-4">{{ fb.progress_status }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-500">Tidak ada feedback kritik dalam periode ini.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    #sentiment-progress-bar {
+        width: var(--progress-width, 0%);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Revenue Line Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: JSON.parse('{{ daily_trend.dates|safe }}' || '[]'),
+            datasets: [{
+                label: 'Pendapatan PAID (Rp)',
+                data: JSON.parse('{{ daily_trend.revenues|safe }}' || '[]'),
+                borderColor: '#E52E2E',
+                backgroundColor: 'rgba(229,46,46,0.1)',
+                tension: 0.2,
+                fill: true
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: true }
+    });
+
+    // Top Packages Pie Chart
+    const packageCtx = document.getElementById('packageChart').getContext('2d');
+    new Chart(packageCtx, {
+        type: 'pie',
+        data: {
+            labels: JSON.parse('{{ top_packages.labels|safe }}' || '[]'),
+            datasets: [{
+                data: JSON.parse('{{ top_packages.data|safe }}' || '[]'),
+                backgroundColor: ['#E52E2E', '#F97316', '#FBBF24', '#34D399', '#3B82F6']
+            }]
+        }
+    });
+
+    // Sentiment Bar Chart
+    const barCtx = document.getElementById('sentimentBarChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Positif (4-5)', 'Netral (3)', 'Negatif (1-2)'],
+            datasets: [{
+                label: 'Jumlah Feedback',
+                data: [
+                    Number('{{ sentiment.positive|default:0 }}'),
+                    Number('{{ sentiment.neutral|default:0 }}'),
+                    Number('{{ sentiment.negative|default:0 }}')
+                ],
+                backgroundColor: ['#22C55E', '#EAB308', '#EF4444']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    stepSize: 1
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
