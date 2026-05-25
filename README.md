@@ -98,6 +98,7 @@ IMPAL_Optimized-Joss-Laundry-Management-System/
 ## Main Features
 
 - **Multi-role**: Customer, Karyawan, Owner dengan dashboard masing-masing.
+- **Manajemen Akun Karyawan**: Dilakukan oleh Owner.
 - **Manajemen Paket Laundry**: Owner dapat menambah, mengedit, menghapus paket laundry (dengan periode berlaku).
 - **Order Walk-in**: Karyawan input pesanan tanpa login customer, generate kode nota unik, dan kirim notifikasi via WhatsApp.
 - **Klaim Pesanan**: Customer dapat mengklaim nota menggunakan kode & nomor HP yang diterima.
