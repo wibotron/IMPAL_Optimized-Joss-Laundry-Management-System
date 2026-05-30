@@ -7,7 +7,7 @@ Dibangun dengan **Django** dan **PostgreSQL** sebagai tugas besar mata kuliah IM
 ```text
 IMPAL_Optimized-Joss-Laundry-Management-System/
 ├── .gitignore
-├── apps/ Semua logika BE modul aplikasi Django
+├── apps/
 │   ├── accounts/
 │   │   ├── __init__.py
 │   │   ├── admin.py
@@ -60,13 +60,19 @@ IMPAL_Optimized-Joss-Laundry-Management-System/
 ├── core/
 │   ├── __init__.py
 │   ├── asgi.py
+│   ├── management/
+│   │   ├── __init__.py
+│   │   └── commands/
+│   │       ├── __init__.py
+│   │       └── seed_data.py
 │   ├── settings.py
 │   ├── urls.py
 │   ├── views.py
 │   └── wsgi.py
 ├── manage.py
-├── requirements.txt # Daftar package yang dibutuhkan
-└── templates/ # Semua file HTML, Tailwind, Chart.js (FE needs)
+├── README.md
+├── requirements.txt
+└── templates/
     ├── accounts/
     │   ├── dashboard_customer.html
     │   ├── dashboard_karyawan.html
