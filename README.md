@@ -134,16 +134,13 @@ IMPAL_Optimized-Joss-Laundry-Management-System/
    ```bash
    git clone https://github.com/username/IMPAL_Optimized-Joss-Laundry-Management-System.git
    cd IMPAL_Optimized-Joss-Laundry-Management-System
-
 2. **Buat dan aktifkan virtual environment**
    ```bash
    git clone https://github.com/username/IMPAL_Optimized-Joss-Laundry-Management-System.git
    cd IMPAL_Optimized-Joss-Laundry-Management-System
-
 3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
-
 4. **Konfigurasi Database**
    - buat database postgreSQL dengan nama bebas.
    - Salin file .env.example berikut menjadi .env dilanjut edit core/settings.py:
@@ -157,18 +154,25 @@ IMPAL_Optimized-Joss-Laundry-Management-System/
             'HOST': 'localhost',
             'PORT': '5432',
         }
-    }
+   }
 5. **Jalankan Migrasi**
    ``` bash
    python manage.py makemigrations
    python manage.py migrate
-6. **Buat akun superuser (owner)**
+6. **Isi data master (SEEDING)**
+   WAJIB dijalankan setelah migrasi untuk mengisi data awal, Script ini akan membuat:
+   - Paket laundry: Reguler, Express, Eksekutif
+   - Akun Owner: owner / owner123
+   - Akun Karyawan contoh: kasir / kasir123
+   - Script ini aman dijalankan berulang kali (tidak akan menggandakan data).
    ```bash
-   python manage.py createsuperuser
-7. **Jalankan Server Development**
+   python manage.py seed_data
+7. Kumpulkan static files (untuk production, opsional di development)
+   ```bash
+   python manage.py collectstatic
+8. **Jalankan Server Development**
    ```bash
    python manage.py runserver
-
 ## Kontribusi
 1. Fork repositori ini.
 2. Buat branch fitur (git checkout -b fitur-anda).
