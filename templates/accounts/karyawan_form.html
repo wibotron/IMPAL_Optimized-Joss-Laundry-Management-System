@@ -1,29 +1,737 @@
 {% extends 'base.html' %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title }} - Joss Laundry{% endblock %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-8">
-    <div class="bg-white rounded-xl shadow p-6">
-        <h1 class="text-2xl font-bold mb-6">{{ title }}</h1>
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}<p class="text-red-500 text-xs">{{ field.errors.0 }}</p>{% endif %}
-                {% if field.help_text %}<p class="text-gray-500 text-xs">{{ field.help_text }}</p>{% endif %}
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet">
+
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  :root {
+    --red: #C8251F;
+    --red-deep: #A01A15;
+    --red-glow: rgba(200, 37, 31, 0.14);
+    --red-soft: rgba(200, 37, 31, 0.07);
+    --gold: #A87B00;
+    --gold-dim: rgba(168, 123, 0, 0.08);
+    --gold-border: rgba(168, 123, 0, 0.28);
+    --bg: #FAF7F4;
+    --surface: #FFFFFF;
+    --surface-2: #F5F0EB;
+    --border: rgba(26, 26, 26, 0.1);
+    --border-hover: rgba(26, 26, 26, 0.2);
+    --ink: #1A1A1A;
+    --ink-dim: rgba(26, 26, 26, 0.5);
+    --muted: #777777;
+    --green: #16a34a;
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .joss-page {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 56px 24px 80px;
+    position: relative;
+    overflow: hidden;
+    color: var(--ink);
+  }
+
+  /* ── NOISE TEXTURE ── */
+  .joss-page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+  }
+
+  /* ── AMBIENT GLOWS ── */
+  .glow-red {
+    position: fixed;
+    top: -180px;
+    left: -180px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(200, 37, 31, 0.07) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+    animation: glowFloat 9s ease-in-out infinite;
+  }
+
+  .glow-gold {
+    position: fixed;
+    bottom: -200px;
+    right: -150px;
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(168, 123, 0, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+    animation: glowFloat2 12s ease-in-out infinite;
+  }
+
+  @keyframes glowFloat {
+
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+
+    50% {
+      transform: translate(50px, 35px);
+    }
+  }
+
+  @keyframes glowFloat2 {
+
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+
+    50% {
+      transform: translate(-35px, -50px);
+    }
+  }
+
+  /* ── DOT GRID BACKGROUND ── */
+  .dot-grid {
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(26, 26, 26, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── CONTENT CONTAINER ── */
+  .joss-container {
+    position: relative;
+    z-index: 1;
+    max-width: 740px;
+    margin: 0 auto;
+    animation: fadeUp 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── BACK LINK ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 28px;
+    padding: 7px 14px 7px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .back-link:hover {
+    color: var(--ink);
+    border-color: var(--border-hover);
+    transform: translateX(-3px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  }
+
+  .back-link .arrow {
+    font-size: 1rem;
+  }
+
+  /* ── CARD ── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.06),
+      0 1px 4px rgba(0, 0, 0, 0.04);
+    position: relative;
+  }
+
+  /* top accent bar */
+  .form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red) 0%, #E8573C 45%, var(--gold) 100%);
+    z-index: 2;
+  }
+
+  /* ── CARD HEADER ── */
+  .card-header {
+    padding: 40px 44px 32px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* decorative corner circle */
+  .card-header::after {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, var(--red-soft) 0%, transparent 65%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .header-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(200, 37, 31, 0.06);
+    border: 1px solid rgba(200, 37, 31, 0.15);
+    border-radius: 100px;
+    padding: 4px 12px 4px 8px;
+    margin-bottom: 14px;
+  }
+
+  .eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.45;
+      transform: scale(0.65);
+    }
+  }
+
+  .header-eyebrow span {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--red);
+  }
+
+  .card-header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+
+  .card-header h1 .accent {
+    color: var(--red);
+  }
+
+  .card-header p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  /* ── FORM BODY ── */
+  .card-body {
+    padding: 36px 44px 44px;
+  }
+
+  /* ── FIELD GROUP ── */
+  .field-group {
+    margin-bottom: 24px;
+    opacity: 0;
+  }
+
+  .field-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+
+  .field-group:focus-within .field-label {
+    color: var(--red);
+  }
+
+  .field-required {
+    color: var(--red);
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  /* ── INPUT WRAPPER ── */
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-wrap::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 18%;
+    bottom: 18%;
+    width: 3px;
+    background: var(--red);
+    border-radius: 0 3px 3px 0;
+    opacity: 0;
+    transform: scaleY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+  }
+
+  .input-wrap:focus-within::before {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  /* ── INPUT STYLES ── */
+  .joss-page input:not([type="checkbox"]):not([type="submit"]),
+  .joss-page textarea,
+  .joss-page select {
+    width: 100%;
+    padding: 13px 18px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--ink);
+    outline: none;
+    transition: all 0.25s ease;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .joss-page input:not([type="checkbox"]):not([type="submit"]):hover,
+  .joss-page textarea:hover,
+  .joss-page select:hover {
+    border-color: var(--border-hover);
+    background: #F0EBE5;
+  }
+
+  .joss-page input:not([type="checkbox"]):not([type="submit"]):focus,
+  .joss-page textarea:focus,
+  .joss-page select:focus {
+    border-color: var(--red);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px var(--red-glow);
+  }
+
+  .joss-page textarea {
+    min-height: 110px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .joss-page select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 44px;
+    cursor: pointer;
+  }
+
+  /* checkbox */
+  .joss-page input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--red);
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .checkbox-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .checkbox-wrap:hover {
+    border-color: var(--border-hover);
+    background: #F0EBE5;
+  }
+
+  .checkbox-label-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ── ERROR & HELP ── */
+  .field-error {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--red);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 7px;
+    padding: 6px 12px;
+    background: rgba(200, 37, 31, 0.05);
+    border-radius: 8px;
+    border-left: 3px solid var(--red);
+  }
+
+  .field-error svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .field-help {
+    font-size: 0.76rem;
+    color: var(--muted);
+    margin-top: 6px;
+    padding-left: 4px;
+    line-height: 1.5;
+  }
+
+  /* ── DIVIDER ── */
+  .form-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── FORM ACTIONS ── */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    opacity: 0;
+  }
+
+  .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 26px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-cancel:hover {
+    background: var(--surface-2);
+    border-color: var(--border-hover);
+    color: var(--ink);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 32px;
+    background: var(--red);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 18px var(--red-glow);
+  }
+
+  .btn-submit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  .btn-submit:hover {
+    background: var(--red-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px var(--red-glow);
+  }
+
+  .btn-submit:hover::after {
+    transform: translateX(100%);
+  }
+
+  .btn-submit:active {
+    transform: translateY(0);
+  }
+
+  .btn-submit svg,
+  .btn-cancel svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ── FLOATING BADGE (top-right corner decoration) ── */
+  .corner-badge {
+    position: absolute;
+    top: 40px;
+    right: 44px;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    animation: fadeUp 0.7s 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+
+    .card-header,
+    .card-body {
+      padding: 28px 24px;
+    }
+
+    .joss-page {
+      padding: 32px 16px 60px;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .form-actions {
+      flex-direction: column-reverse;
+    }
+
+    .corner-badge {
+      display: none;
+    }
+  }
+</style>
+
+<div class="joss-page">
+  <div class="dot-grid"></div>
+  <div class="glow-red"></div>
+  <div class="glow-gold"></div>
+
+  <div class="joss-container">
+
+    <!-- BACK LINK -->
+    <a href="{% url 'accounts:karyawan_list' %}" class="back-link">
+      <span class="arrow">←</span> Kembali ke Daftar Karyawan
+    </a>
+
+    <!-- FORM CARD -->
+    <div class="form-card">
+
+      <!-- HEADER -->
+      <div class="card-header">
+        <div class="corner-badge">Form Resmi</div>
+        <div class="header-eyebrow">
+          <div class="eyebrow-dot"></div>
+          <span>Manajemen Karyawan</span>
+        </div>
+        <h1><span class="accent">{{ title|upper }}</span></h1>
+        <p>Isi formulir ini dengan lengkap untuk memperbarui database sistem.</p>
+      </div>
+
+      <!-- BODY -->
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% for field in form %}
+          <div class="field-group">
+
+            {% if field.field.widget.input_type == 'checkbox' %}
+            <!-- CHECKBOX LAYOUT -->
+            <label class="checkbox-wrap" for="{{ field.id_for_label }}">
+              {{ field }}
+              <span class="checkbox-label-text">
+                {{ field.label }}
+                {% if field.field.required %}<span class="field-required"> *</span>{% endif %}
+              </span>
+            </label>
+            {% else %}
+            <!-- STANDARD FIELD LAYOUT -->
+            <div class="field-label">
+              {{ field.label }}
+              {% if field.field.required %}<span class="field-required">*</span>{% endif %}
             </div>
-            {% endfor %}
-            <div class="flex gap-3">
-                <button type="submit" class="bg-brand-red text-white px-4 py-2 rounded-lg">Simpan</button>
-                <a href="{% url 'accounts:karyawan_list' %}" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</a>
+            <div class="input-wrap">
+              {{ field }}
             </div>
+            {% endif %}
+
+            {% if field.errors %}
+            <div class="field-error">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {{ field.errors.0 }}
+            </div>
+            {% endif %}
+
+            {% if field.help_text %}
+            <div class="field-help">{{ field.help_text }}</div>
+            {% endif %}
+
+          </div>
+          {% endfor %}
+
+          <div class="form-divider"></div>
+
+          <div class="form-actions">
+            <a href="{% url 'accounts:karyawan_list' %}" class="btn-cancel">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Batal
+            </a>
+            <button type="submit" class="btn-submit">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+              Simpan Data
+            </button>
+          </div>
+
         </form>
+      </div>
     </div>
+
+  </div>
 </div>
+
 <script>
-    document.querySelectorAll('input, textarea, select').forEach(el => {
-        if (el.type !== 'submit' && el.type !== 'checkbox') el.classList.add('w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-lg', 'focus:ring-2', 'focus:ring-brand-red');
+  document.addEventListener('DOMContentLoaded', () => {
+
+    /* ── Staggered fade-up untuk setiap field ── */
+    const groups = document.querySelectorAll('.field-group, .form-actions');
+    groups.forEach((el, i) => {
+      el.style.animation = 'fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards';
+      el.style.animationDelay = `${(i + 1) * 100}ms`;
     });
+
+    /* ── Ripple effect pada tombol submit ── */
+    const submitBtn = document.querySelector('.btn-submit');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', function (e) {
+        const rect = this.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.cssText = `
+          position:absolute; border-radius:50%;
+          width:${size}px; height:${size}px;
+          left:${e.clientX - rect.left - size / 2}px;
+          top:${e.clientY - rect.top - size / 2}px;
+          background:rgba(255,255,255,0.25);
+          transform:scale(0); animation:ripple 0.55s linear;
+          pointer-events:none;
+        `;
+        this.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+      });
+    }
+
+    /* ── Submit loading state ── */
+    const form = document.querySelector('form');
+    if (form && submitBtn) {
+      form.addEventListener('submit', () => {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <svg style="animation:spin 0.8s linear infinite;width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/>
+          </svg>
+          Menyimpan...
+        `;
+      });
+    }
+
+  });
 </script>
+
+<style>
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
 {% endblock %}

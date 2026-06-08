@@ -1,66 +1,369 @@
-{% extends 'base.html' %}
-{% block title %}Login - JOSS Laundry{% endblock %}
-{% block content %}
-<div class="flex min-h-screen">
-    <!-- Left Panel (hidden on mobile) -->
-    <div class="hidden md:flex w-1/2 bg-dark-panel flex-col items-center justify-center p-12 text-white">
-        <div class="text-center mb-12">
-            <h1 class="text-5xl font-bold">JOSS ★ LAUNDRY</h1>
-            <p class="text-gray-400 mt-2">Login sebagai:</p>
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOSS LAUNDRY — Login</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --red: #C8251F;
+            --red-deep: #A01A15;
+            --red-glow: rgba(200, 37, 31, 0.12);
+            --dark: #FAF7F4;
+            --dark-2: #FFFFFF;
+            --white: #1A1A1A;
+            --white-dim: rgba(26, 26, 26, 0.5);
+            --white-border: rgba(26, 26, 26, 0.1);
+            --gold: #A87B00;
+        }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background: var(--dark);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ── NOISE TEXTURE ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.25;
+        }
+
+        .left-panel {
+            flex: 1;
+            position: relative;
+            background-image: url("{% static 'images/login-bg.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            display: none;
+        }
+
+        @media (min-width: 1024px) {
+            .left-panel {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 64px;
+            }
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7));
+        }
+
+        .left-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        .logo-white {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 0.08em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-white .star {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .hero-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4.5rem;
+            line-height: 1;
+            margin-top: auto;
+            letter-spacing: 0.02em;
+            margin-bottom: 20px;
+            animation: fadeUp 1s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .hero-title span {
+            color: var(--red);
+        }
+
+        .hero-sub {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 400px;
+            line-height: 1.6;
+            animation: fadeUp 1s 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            display: inline-block;
+            margin-top: 40px;
+            animation: fadeUp 1s 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .glass-stat {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .glass-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+        }
+
+        .right-panel {
+            flex: 1;
+            max-width: 600px;
+            width: 100%;
+            background: var(--dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px;
+            position: relative;
+            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        @media (max-width: 1024px) {
+            .right-panel {
+                max-width: 100%;
+                margin: 0 auto;
+                align-items: center;
+                text-align: center;
+            }
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+            animation: fadeUp 0.8s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--white-border);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .form-container h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            line-height: 1;
+            margin-bottom: 12px;
+            letter-spacing: 0.02em;
+        }
+
+        .form-container p {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            position: relative;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: var(--dark-2);
+            border: 1px solid var(--white-border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 1rem;
+            color: var(--white);
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--red);
+            box-shadow: 0 0 0 4px var(--red-glow);
+            background: white;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 14px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            margin-top: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit:hover {
+            background: var(--red-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px var(--red-glow);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* Error messages */
+        .alert {
+            background: rgba(200, 37, 31, 0.1);
+            border-left: 4px solid var(--red);
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 0 12px 12px 0;
+            font-size: 0.85rem;
+            color: var(--red-deep);
+            font-weight: 600;
+        }
+
+        .register-link {
+            display: block;
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .register-link a {
+            color: var(--red);
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .register-link a:hover {
+            color: var(--red-deep);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Left Side: Hero Brand -->
+    <div class="left-panel">
+        <div class="overlay"></div>
+        <div class="left-content">
+            <a href="#" class="logo-white">
+                JOSS <span class="star">★</span> LAUNDRY
+            </a>
         </div>
-        <div class="grid grid-cols-3 gap-6 w-full max-w-md">
-            <div class="border border-gray-600 rounded-xl p-6 text-center hover:bg-gray-800 transition">
-                <span class="text-4xl">🛍️</span>
-                <p class="mt-2 font-semibold">Customer</p>
-            </div>
-            <div class="border border-gray-600 rounded-xl p-6 text-center hover:bg-gray-800 transition">
-                <span class="text-4xl">👔</span>
-                <p class="mt-2 font-semibold">Karyawan</p>
-            </div>
-            <div class="border border-gray-600 rounded-xl p-6 text-center hover:bg-gray-800 transition">
-                <span class="text-4xl">👑</span>
-                <p class="mt-2 font-semibold">Owner</p>
+        <div class="left-content">
+            <h1 class="hero-title">Platform<br><span>Laundry Modern</span></h1>
+            <p class="hero-sub">Kelola pesanan, pantau operasional, dan tingkatkan pelayanan dengan ekosistem digital
+                JOSS Laundry.</p>
+
+            <div class="glass-card">
+                <div class="glass-stat">100%</div>
+                <div class="glass-label">Terintegrasi & Aman</div>
             </div>
         </div>
     </div>
 
-    <!-- Right Panel (Login Form) -->
-    <div class="w-full md:w-1/2 bg-white flex flex-col justify-center p-8 lg:p-20">
-        <div class="max-w-md mx-auto w-full">
-            <div class="bg-brand-red text-white text-xs font-bold px-3 py-1 rounded inline-block mb-4">Customer / Staff</div>
-            <h2 class="text-3xl font-extrabold text-gray-900 uppercase">Selamat Datang Kembali!</h2>
-            <p class="text-gray-500 mb-8">Masukkan username dan password Anda</p>
+    <!-- Right Side: Login Form -->
+    <div class="right-panel">
+        <div class="form-container">
+            <div class="badge">Akses Sistem</div>
+            <h2>Selamat Datang</h2>
+            <p>Gunakan kredensial Anda untuk masuk ke sistem.</p>
 
-            <!-- Display Django messages (error/success) -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="mb-4 p-3 rounded text-sm {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-200{% elif message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200{% else %}bg-blue-100 text-blue-700 border border-blue-200{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+            {% if form.errors %}
+            <div class="alert">Username atau password yang Anda masukkan salah. Silakan coba lagi.</div>
             {% endif %}
 
             <form method="post">
                 {% csrf_token %}
-                <div class="mb-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Username</label>
-                    <input type="text" name="username" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-red" required>
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="Masukkan username" required autofocus>
                 </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Password</label>
-                    <input type="password" name="password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-red" required>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="w-full bg-brand-red text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Login →</button>
+
+                <button type="submit" class="btn-submit">Masuk Sekarang</button>
             </form>
 
-            <div class="mt-8 text-center text-gray-400 text-sm flex items-center justify-center gap-2 before:h-px before:w-1/4 before:bg-gray-200 after:h-px after:w-1/4 after:bg-gray-200">
-                atau
+            <div class="register-link">
+                Belum memiliki akun? <a href="{% url 'accounts:register' %}">Daftar di sini</a>
             </div>
-            <p class="mt-6 text-center text-sm">
-                Belum punya akun? 
-                <a href="{% url 'accounts:register' %}" class="text-brand-red font-bold hover:underline">Daftar sebagai Customer</a>
-            </p>
         </div>
     </div>
-</div>
-{% endblock %}
+
+</body>
+
+</html>

@@ -1,29 +1,344 @@
 {% extends 'base.html' %}
-{% block title %}Customer Dashboard{% endblock %}
+{% block title %}Customer Dashboard - Joss Laundry{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold">Halo, {{ user.full_name }}! 👋</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-        <a href="{% url 'orders:claim_order' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">📦</div>
-            <h3 class="font-bold mt-2">Klaim Pesanan</h3>
-            <p class="text-sm text-gray-500">Masukkan kode nota</p>
-        </a>
-        <a href="{% url 'orders:customer_dashboard' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">📊</div>
-            <h3 class="font-bold mt-2">Status Progress</h3>
-            <p class="text-sm text-gray-500">Lihat riwayat pesanan</p>
-        </a>
-        <a href="{% url 'orders:customer_dashboard' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">📄</div>
-            <h3 class="font-bold mt-2">Unduh Nota</h3>
-            <p class="text-sm text-gray-500">Setelah lunas</p>
-        </a>
-        <a href="{% url 'orders:customer_dashboard' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">💬</div>
-            <h3 class="font-bold mt-2">Beri Feedback</h3>
-            <p class="text-sm text-gray-500">Untuk pesanan lunas</p>
-        </a>
-    </div>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+    .customer-dashboard {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 250, 245, 0.95)),
+            url('https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=2000&auto=format&fit=crop') center/cover fixed no-repeat;
+        min-height: 100vh;
+    }
+
+    /* Menu item cards */
+    .menu-item-btn {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .menu-item-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(200, 37, 31, 0.05);
+        border-color: rgba(200, 37, 31, 0.15);
+    }
+
+    /* Section Label */
+    .section-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #9CA3AF;
+    }
+</style>
+
+<div class="customer-dashboard py-6">
+
+    <!-- ══════════════════ HERO GREETING (COMPACT) ══════════════════ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+        <span
+            class="inline-flex items-center gap-1.5 bg-red-50 text-red-700 text-[9px] font-black px-3 py-0.5 rounded-full border border-red-100 uppercase tracking-widest mb-2.5">
+            ✨ Premium Client Portal
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-black text-gray-900 leading-tight flex items-center gap-3">
+            Halo,
+            <span
+                class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-amber-500 bg-clip-text text-transparent font-extrabold">
+                <!-- User icon -->
+
+                {{ user.username|default:"Pelanggan Setia" }}
+            </span>
+            <span class="text-2xl">👋</span>
+        </h1>
+        <p class="mt-2 text-xs text-gray-500 max-w-2xl leading-relaxed font-semibold">
+            Selamat datang kembali di **Joss Laundry**. Kami berkomitmen penuh untuk merawat dan mencuci pakaian Anda
+            dengan kualitas higienis serta keharuman premium kelas satu.
+        </p>
+    </section>
+
+    <!-- ══════════════════ LAYANAN UTAMA (4 COLUMNS GRID) ══════════════════ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="section-label mb-3">Layanan & Aksi Utama Anda</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <!-- Klaim Pesanan -->
+            <a href="{% url 'orders:claim_order' %}"
+                class="menu-item-btn bg-white/90 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                <div
+                    class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg shadow-sm border border-red-100 shrink-0">
+                    📦
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-gray-900 text-sm">Klaim Pesanan</h3>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">Sinkronkan Kode Nota struk belanja Anda.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Status Progress -->
+            <a href="{% url 'orders:customer_dashboard' %}"
+                class="menu-item-btn bg-white/90 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                <div
+                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-sm border border-blue-100 shrink-0">
+                    📊
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-gray-900 text-sm">Status Progress</h3>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">Pantau status pengerjaan secara real-time.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Unduh Nota -->
+            <a href="{% url 'orders:customer_dashboard' %}"
+                class="menu-item-btn bg-white/90 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                <div
+                    class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shadow-sm border border-emerald-100 shrink-0">
+                    📄
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-gray-900 text-sm">Unduh Nota PDF</h3>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">Unduh struk nota digital resmi Anda.</p>
+                </div>
+            </a>
+
+            <!-- Beri Feedback -->
+            <a href="{% url 'orders:customer_dashboard' %}"
+                class="menu-item-btn bg-white/90 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                <div
+                    class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg shadow-sm border border-amber-100 shrink-0">
+                    💬
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-gray-900 text-sm">Beri Feedback</h3>
+                    <p class="text-[10px] text-gray-400 font-semibold mt-0.5">Kirim ulasan/kritik pelayanan kami.</p>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- ══════════════════ PILIHAN PAKET LAUNDRY (3 COLUMNS GRID) ══════════════════ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="section-label mb-3">Pilihan Paket Laundry Premium</div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Paket 1 -->
+            <div
+                class="bg-white/95 backdrop-blur-sm rounded-3xl border border-gray-100 p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition duration-300 relative overflow-hidden group">
+                <div
+                    class="absolute -right-8 -top-8 w-24 h-24 bg-red-500/5 rounded-full transition-transform duration-500 group-hover:scale-150 pointer-events-none">
+                </div>
+                <div>
+                    <div class="flex justify-between items-start mb-3">
+                        <span
+                            class="inline-flex items-center gap-1.5 bg-red-50 text-red-700 text-[9px] font-extrabold px-2.5 py-1 rounded-full border border-red-100 tracking-wider">REGULER</span>
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">⏱️ 2
+                            Hari</span>
+                    </div>
+                    <h3 class="text-lg font-black text-gray-900 mb-1.5">Paket Reguler</h3>
+                    <p class="text-[11px] text-gray-400 font-semibold leading-relaxed mb-4">
+                        Layanan pencucian pakaian harian higienis dengan penanganan terpisah untuk menjaga kebersihan
+                        maksimal & keharuman segar.
+                    </p>
+                </div>
+                <div class="border-t border-gray-50 pt-3 flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-extrabold text-gray-400 uppercase tracking-wider">Tarif Per
+                            Kg</span>
+                        <span class="text-base font-black text-red-600">Rp 8.000</span>
+                    </div>
+                    <span
+                        class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Tersedia</span>
+                </div>
+            </div>
+
+            <!-- Paket 2 -->
+            <div
+                class="bg-white/95 backdrop-blur-sm rounded-3xl border border-gray-100 p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition duration-300 relative overflow-hidden group">
+                <div
+                    class="absolute -right-8 -top-8 w-24 h-24 bg-red-500/5 rounded-full transition-transform duration-500 group-hover:scale-150 pointer-events-none">
+                </div>
+                <div>
+                    <div class="flex justify-between items-start mb-3">
+                        <span
+                            class="inline-flex items-center gap-1.5 bg-red-50 text-red-700 text-[9px] font-extrabold px-2.5 py-1 rounded-full border border-red-100 tracking-wider">EXPRESS</span>
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">⏱️ 1
+                            Hari</span>
+                    </div>
+                    <h3 class="text-lg font-black text-gray-900 mb-1.5">Paket Express</h3>
+                    <p class="text-[11px] text-gray-400 font-semibold leading-relaxed mb-4">
+                        Layanan cuci cepat kilat 24 jam selesai, sangat cocok bagi Anda yang menginginkan kecepatan
+                        pengerjaan premium.
+                    </p>
+                </div>
+                <div class="border-t border-gray-50 pt-3 flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-extrabold text-gray-400 uppercase tracking-wider">Tarif Per
+                            Kg</span>
+                        <span class="text-base font-black text-red-600">Rp 12.000</span>
+                    </div>
+                    <span
+                        class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Tersedia</span>
+                </div>
+            </div>
+
+            <!-- Paket 3 -->
+            <div
+                class="bg-white/95 backdrop-blur-sm rounded-3xl border border-gray-100 p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition duration-300 relative overflow-hidden group">
+                <div
+                    class="absolute -right-8 -top-8 w-24 h-24 bg-red-500/5 rounded-full transition-transform duration-500 group-hover:scale-150 pointer-events-none">
+                </div>
+                <div>
+                    <div class="flex justify-between items-start mb-3">
+                        <span
+                            class="inline-flex items-center gap-1.5 bg-red-50 text-red-700 text-[9px] font-extrabold px-2.5 py-1 rounded-full border border-red-100 tracking-wider">EKSEKUTIF</span>
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">⏱️ 1
+                            Hari</span>
+                    </div>
+                    <h3 class="text-lg font-black text-gray-900 mb-1.5">Paket Eksekutif</h3>
+                    <p class="text-[11px] text-gray-400 font-semibold leading-relaxed mb-4">
+                        Perawatan eksklusif pakaian halus/sensitif menggunakan setrika uap modern dan deterjen ramah
+                        serat kain paling sempurna.
+                    </p>
+                </div>
+                <div class="border-t border-gray-50 pt-3 flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-extrabold text-gray-400 uppercase tracking-wider">Tarif Per
+                            Kg</span>
+                        <span class="text-base font-black text-red-600">Rp 15.000</span>
+                    </div>
+                    <span
+                        class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Tersedia</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════ ALUR TATA CARA ORDER (TIMELINE GRID) ══════════════════ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="section-label mb-3">Alur Tata Cara Order (Sistem & Klien)</div>
+
+        <div
+            class="bg-white/95 backdrop-blur-sm rounded-3xl border border-gray-100 p-6 shadow-sm relative overflow-hidden">
+            <!-- Background Glow -->
+            <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-red-500/5 rounded-full blur-3xl pointer-events-none">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
+                <!-- Langkah 1 -->
+                <div class="flex flex-col gap-2 group">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-red-50 text-red-600 font-extrabold flex items-center justify-center text-xs border border-red-100">
+                            01</div>
+                        <div class="h-[1px] bg-gradient-to-r from-red-100 to-amber-100 flex-grow hidden md:block"></div>
+                    </div>
+                    <h4 class="font-extrabold text-xs text-gray-900 mt-1 flex items-center gap-1.5">
+                        <span>Drop Cucian</span><span>🧺</span>
+                    </h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold">
+                        Bawa cucian kotor Anda langsung ke outlet. Karyawan kami siap melayani Anda.
+                    </p>
+                </div>
+
+                <!-- Langkah 2 -->
+                <div class="flex flex-col gap-2 group">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 font-extrabold flex items-center justify-center text-xs border border-amber-100">
+                            02</div>
+                        <div class="h-[1px] bg-gradient-to-r from-amber-100 to-green-100 flex-grow hidden md:block">
+                        </div>
+                    </div>
+                    <h4 class="font-extrabold text-xs text-gray-900 mt-1 flex items-center gap-1.5">
+                        <span>Timbang & Pilih</span><span>⚖️</span>
+                    </h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold">
+                        Cucian ditimbang beratnya, lalu Anda tinggal menentukan jenis paket laundry yang diinginkan.
+                    </p>
+                </div>
+
+                <!-- Langkah 3 -->
+                <div class="flex flex-col gap-2 group">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-green-50 text-green-600 font-extrabold flex items-center justify-center text-xs border border-green-100">
+                            03</div>
+                        <div class="h-[1px] bg-gradient-to-r from-green-100 to-blue-100 flex-grow hidden md:block">
+                        </div>
+                    </div>
+                    <h4 class="font-extrabold text-xs text-gray-900 mt-1 flex items-center gap-1.5">
+                        <span>Nota via WA</span><span>📲</span>
+                    </h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold">
+                        Sistem mengirimkan notifikasi Kode Nota unik langsung ke akun WhatsApp Anda secara real-time.
+                    </p>
+                </div>
+
+                <!-- Langkah 4 -->
+                <div class="flex flex-col gap-2 group">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 font-extrabold flex items-center justify-center text-xs border border-blue-100">
+                            04</div>
+                    </div>
+                    <h4 class="font-extrabold text-xs text-gray-900 mt-1 flex items-center gap-1.5">
+                        <span>Pantau & Ambil</span><span>✨</span>
+                    </h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold">
+                        Gunakan menu **Klaim Pesanan** untuk memantau pengerjaan cucian. Ambil pakaian jika sudah
+                        selesai.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════ JAMINAN KUALITAS (4 COLUMNS GRID) ══════════════════ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pb-8">
+        <div class="section-label mb-3">Komitmen Kualitas Premium JOSS Laundry</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <div class="promise-card rounded-2xl p-5 shadow-sm flex gap-4 bg-white/95 backdrop-blur-sm">
+                <div class="text-3xl shrink-0">🧼</div>
+                <div>
+                    <h4 class="font-extrabold text-xs text-gray-900">Garansi Bersih & Wangi</h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold mt-1">Dicuci dengan deterjen
+                        khusus dan pewangi premium tahan lama yang aman untuk pakaian.</p>
+                </div>
+            </div>
+
+            <div class="promise-card rounded-2xl p-5 shadow-sm flex gap-4 bg-white/95 backdrop-blur-sm">
+                <div class="text-3xl shrink-0">⏱️</div>
+                <div>
+                    <h4 class="font-extrabold text-xs text-gray-900">Estimasi Tepat Waktu</h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold mt-1">Proses pencucian selesai
+                        sesuai dengan estimasi hari yang tertera di paket Anda.</p>
+                </div>
+            </div>
+
+            <div class="promise-card rounded-2xl p-5 shadow-sm flex gap-4 bg-white/95 backdrop-blur-sm">
+                <div class="text-3xl shrink-0">🛡️</div>
+                <div>
+                    <h4 class="font-extrabold text-xs text-gray-900">Penanganan Higienis</h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold mt-1">Setiap customer dicuci
+                        terpisah (tidak dicampur) guna menjaga higienitas dan menghindari tertukar.</p>
+                </div>
+            </div>
+
+            <div class="promise-card rounded-2xl p-5 shadow-sm flex gap-4 bg-white/95 backdrop-blur-sm">
+                <div class="text-3xl shrink-0">💬</div>
+                <div>
+                    <h4 class="font-extrabold text-xs text-gray-900">Support Responsif</h4>
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold mt-1">Staf kami siap menanggapi
+                        secara cepat ulasan, komplain, atau masukan berharga Anda.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
 </div>
 {% endblock %}

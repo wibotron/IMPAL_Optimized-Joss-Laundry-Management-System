@@ -1,24 +1,867 @@
 {% extends 'base.html' %}
-{% block title %}Owner Dashboard{% endblock %}
+{% block title %}Owner Command Center{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold">Owner Command Center</h1>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <a href="{% url 'packages:package_list' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">🏷️</div>
-            <h3 class="font-bold">Paket Laundry</h3>
-            <p class="text-sm text-gray-500">Tambah/edit paket</p>
-        </a>
-        <a href="{% url 'accounts:karyawan_list' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">👥</div>
-            <h3 class="font-bold">Manajemen Karyawan</h3>
-            <p class="text-sm text-gray-500">CRUD karyawan</p>
-        </a>
-        <a href="{% url 'reports:dashboard' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">📈</div>
-            <h3 class="font-bold">Business Reports</h3>
-            <p class="text-sm text-gray-500">Laporan & statistik</p>
-        </a>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+        --red: #DC2626;
+        --red-soft: #FEF2F2;
+        --orange: #EA580C;
+        --green: #16A34A;
+        --green-soft: #F0FDF4;
+        --blue: #2563EB;
+        --blue-soft: #EFF6FF;
+        --amber: #D97706;
+        --amber-soft: #FFFBEB;
+        --purple: #7C3AED;
+        --purple-soft: #F5F3FF;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-400: #9CA3AF;
+        --gray-600: #4B5563;
+        --gray-800: #1F2937;
+        --gray-900: #111827;
+        --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+        --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        background: #F4F5F7 url('https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=2000&auto=format&fit=crop') center/cover fixed no-repeat;
+        background-size: cover;
+    }
+    body::before {
+        content: '';
+        position: fixed; inset: 0;
+        background: rgba(244,245,247,0.24);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .od {
+        position: relative;
+        z-index: 1;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: rgba(244,245,247,0.55);
+        min-height: 100vh;
+        backdrop-filter: blur(18px);
+    }
+
+    /* ── HEADER ── */
+    .od-header {
+        background: white;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .od-logo {
+        display: flex; align-items: center; gap: 10px;
+    }
+    .od-logo-icon {
+        width: 32px; height: 32px;
+        background: var(--red);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .od-logo-text { font-weight: 800; font-size: 15px; color: var(--gray-900); }
+    .od-logo-sub { font-size: 11px; color: var(--gray-400); font-weight: 500; }
+    .od-header-right { display: flex; align-items: center; gap: 12px; }
+    .live-chip {
+        display: flex; align-items: center; gap: 5px;
+        background: var(--green-soft);
+        border: 1px solid #BBF7D0;
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 11px; font-weight: 700;
+        color: var(--green);
+        letter-spacing: 0.03em;
+    }
+    .live-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--green);
+        animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .time-chip {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; color: var(--gray-600);
+        background: var(--gray-100);
+        padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* ── LAYOUT ── */
+    .od-body { max-width: 1280px; margin: 0 auto; padding: 18px 20px 32px; }
+
+    /* ── GREETING BANNER ── */
+    .greeting-banner {
+        background: linear-gradient(135deg, #DC2626 0%, #EA580C 60%, #F59E0B 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+    .greeting-banner::before {
+        content: '';
+        position: absolute;
+        right: -30px; top: -40px;
+        width: 180px; height: 180px;
+        background: rgba(255,255,255,0.07);
+        border-radius: 50%;
+    }
+    .greeting-banner::after {
+        content: '';
+        position: absolute;
+        right: 60px; bottom: -50px;
+        width: 120px; height: 120px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+    }
+    .greeting-text h1 {
+        font-size: 22px; font-weight: 800;
+        color: white; margin: 0 0 4px;
+        line-height: 1.2;
+    }
+    .greeting-text p {
+        font-size: 13px; color: rgba(255,255,255,0.8);
+        margin: 0; font-weight: 500;
+    }
+    .greeting-badge {
+        display: flex; align-items: center; gap: 6px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 20px;
+        padding: 5px 12px;
+        font-size: 12px; font-weight: 700;
+        color: white;
+        backdrop-filter: blur(8px);
+        white-space: nowrap;
+        z-index: 1;
+    }
+    .wave { display: inline-block; animation: wave 2.5s ease-in-out infinite; transform-origin: 70% 70%; }
+    @keyframes wave {
+        0%,100%{transform:rotate(0deg)} 10%{transform:rotate(14deg)} 20%{transform:rotate(-8deg)}
+        30%{transform:rotate(14deg)} 40%{transform:rotate(-4deg)} 50%{transform:rotate(10deg)} 60%{transform:rotate(0deg)}
+    }
+
+    /* ── SECTION LABEL ── */
+    .sec-label {
+        font-size: 10px; font-weight: 800;
+        letter-spacing: 0.12em; text-transform: uppercase;
+        color: var(--gray-400); margin-bottom: 10px;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .sec-label::after {
+        content: ''; flex: 1; height: 1px; background: var(--gray-200);
+    }
+
+    /* ── STAT CARDS - ENRICHED ── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .stats-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 14px 16px;
+        box-shadow: var(--card-shadow);
+        border-left: 3px solid transparent;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow-hover);
+    }
+    .stat-card.red { border-left-color: var(--red); }
+    .stat-card.green { border-left-color: var(--green); }
+    .stat-card.blue { border-left-color: var(--blue); }
+    .stat-card.amber { border-left-color: var(--amber); }
+    .stat-card.purple { border-left-color: var(--purple); }
+
+    .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .stat-icon {
+        width: 32px; height: 32px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .stat-icon.red { background: var(--red-soft); }
+    .stat-icon.green { background: var(--green-soft); }
+    .stat-icon.blue { background: var(--blue-soft); }
+    .stat-icon.amber { background: var(--amber-soft); }
+    .stat-icon.purple { background: var(--purple-soft); }
+
+    .stat-trend {
+        font-size: 10px; font-weight: 700;
+        padding: 2px 7px; border-radius: 20px;
+        display: flex; align-items: center; gap: 2px;
+    }
+    .stat-trend.up { background: var(--green-soft); color: var(--green); }
+    .stat-trend.down { background: var(--red-soft); color: var(--red); }
+    .stat-trend.neutral { background: var(--gray-100); color: var(--gray-600); }
+
+    .stat-value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 26px; font-weight: 700;
+        color: var(--gray-900); line-height: 1;
+        margin-bottom: 3px;
+        font-variant-numeric: tabular-nums;
+    }
+    .stat-label {
+        font-size: 11px; font-weight: 600;
+        color: var(--gray-400); text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+    .stat-sub {
+        font-size: 10px; color: var(--gray-400);
+        margin-top: 2px; font-weight: 500;
+    }
+
+    /* ── FINANCIAL CARDS ── */
+    .financial-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .financial-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow-hover);
+    }
+    .fin-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .fin-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .fin-label { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); }
+    .fin-value { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+    .fin-sub { font-size: 10px; color: var(--gray-400); font-weight: 500; }
+    .fin-bar { height: 4px; border-radius: 4px; background: var(--gray-100); margin-top: 10px; overflow: hidden; }
+    .fin-bar-fill { height: 100%; border-radius: 4px; }
+
+    /* ── MAIN GRID ── */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    /* ── ACTION CARDS ── */
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .action-card {
+        background: white;
+        border-radius: 11px;
+        padding: 13px 14px;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        text-decoration: none;
+        border: 1.5px solid transparent;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .action-card:hover {
+        border-color: var(--red);
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow-hover);
+    }
+    .action-card-icon {
+        width: 38px; height: 38px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+    .action-card:hover .action-card-icon { transform: scale(1.1) rotate(-5deg); }
+    .action-card-body { flex: 1; min-width: 0; }
+    .action-card-title {
+        font-size: 12px; font-weight: 700;
+        color: var(--gray-900); text-transform: uppercase;
+        letter-spacing: 0.04em; line-height: 1.2;
+    }
+    .action-card-sub {
+        font-size: 10px; color: var(--gray-400);
+        font-weight: 500; margin-top: 1px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .action-arrow {
+        color: var(--gray-300);
+        opacity: 0; transform: translateX(-4px);
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    .action-card:hover .action-arrow { opacity: 1; transform: translateX(0); color: var(--red); }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── ALERT BOX ── */
+    .alert-card {
+        background: white;
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: var(--card-shadow);
+    }
+    .alert-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--gray-100);
+    }
+    .alert-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .alert-item:first-child { padding-top: 0; }
+    .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .alert-dot.red { background: var(--red); }
+    .alert-dot.amber { background: var(--amber); }
+    .alert-dot.green { background: var(--green); }
+    .alert-text { font-size: 12px; color: var(--gray-800); font-weight: 600; line-height: 1.3; flex: 1; }
+    .alert-badge {
+        font-size: 10px; font-weight: 700;
+        padding: 2px 8px; border-radius: 20px;
+        flex-shrink: 0;
+    }
+
+    /* ── TABLE ── */
+    .table-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+    .table-card-head {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-card-head h3 { font-size: 12px; font-weight: 800; color: var(--gray-900); text-transform: uppercase; letter-spacing: 0.06em; }
+    .table-card-head a { font-size: 11px; font-weight: 700; color: var(--red); text-decoration: none; display: flex; align-items: center; gap: 3px; }
+    .od-table { width: 100%; border-collapse: collapse; }
+    .od-table th {
+        padding: 8px 14px;
+        text-align: left;
+        font-size: 10px; font-weight: 700;
+        color: var(--gray-400); text-transform: uppercase;
+        letter-spacing: 0.08em; background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    .od-table td { padding: 9px 14px; font-size: 12px; color: var(--gray-800); border-bottom: 1px solid var(--gray-100); }
+    .od-table tr:last-child td { border-bottom: none; }
+    .od-table tbody tr { transition: background 0.15s; }
+    .od-table tbody tr:hover { background: #FFF5F5; }
+    .od-table .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--gray-900); }
+    .pill {
+        display: inline-flex; align-items: center;
+        font-size: 10px; font-weight: 700;
+        padding: 2px 8px; border-radius: 20px;
+        text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .pill-green { background: var(--green-soft); color: var(--green); }
+    .pill-blue { background: var(--blue-soft); color: var(--blue); }
+    .pill-gray { background: var(--gray-100); color: var(--gray-600); }
+    .pill-amber { background: var(--amber-soft); color: var(--amber); }
+    .pill-red { background: var(--red-soft); color: var(--red); }
+
+    /* ── FOOTER ── */
+    .od-footer {
+        background: white;
+        border-top: 1px solid var(--gray-200);
+        padding: 10px 24px;
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: 11px; color: var(--gray-400);
+    }
+    .od-footer strong { color: var(--gray-600); }
+
+    /* ── FADE IN ── */
+    .fi { opacity: 0; transform: translateY(12px); animation: fi 0.5s ease forwards; }
+    .fi-1 { animation-delay: 0.05s; }
+    .fi-2 { animation-delay: 0.12s; }
+    .fi-3 { animation-delay: 0.19s; }
+    .fi-4 { animation-delay: 0.26s; }
+    .fi-5 { animation-delay: 0.33s; }
+    @keyframes fi { to { opacity: 1; transform: translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+        .main-grid { grid-template-columns: 1fr; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .right-panel { display: grid; grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+        .stats-grid, .stats-grid-3 { grid-template-columns: repeat(2, 1fr); }
+        .action-grid { grid-template-columns: 1fr; }
+        .right-panel { grid-template-columns: 1fr; }
+        .od-header { padding: 10px 14px; }
+        .od-body { padding: 12px 12px 24px; }
+        .greeting-banner { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+</style>
+
+<div class="od">
+    <!-- HEADER -->
+    <header class="od-header">
+        <div class="od-logo">
+            <div class="od-logo-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a4 4 0 014-4h10a4 4 0 014 4v3a4 4 0 01-4 4H7a4 4 0 01-4-4V7z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v6m-3-3h6"/>
+                </svg>
+            </div>
+            <div>
+                <div class="od-logo-text">Joss Laundry</div>
+                <div class="od-logo-sub">Owner Command Center</div>
+            </div>
+        </div>
+        <div class="od-header-right">
+            <div class="time-chip" id="live-time"></div>
+            <div class="live-chip">
+                <span class="live-dot"></span> LIVE
+            </div>
+        </div>
+    </header>
+
+    <div class="od-body">
+
+        <!-- GREETING BANNER -->
+        <div class="greeting-banner fi fi-1">
+            <div class="greeting-text">
+                <h1>Halo, {{ user.full_name }}! <span class="wave">👋</span></h1>
+                <p>Semua sistem berjalan optimal. Berikut ringkasan operasional bisnis Anda hari ini.</p>
+            </div>
+            <div class="greeting-badge">
+                <span class="live-dot" style="background:white"></span>
+                Sistem Aktif
+            </div>
+        </div>
+
+        <!-- ROW 1: TODAY'S STATS (4 cards) -->
+        <div class="sec-label fi fi-1">Operasional Hari Ini</div>
+        <div class="stats-grid fi fi-2">
+            <div class="stat-card red">
+                <div class="stat-header">
+                    <div class="stat-icon red">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    <span class="stat-trend up">▲ Aktif</span>
+                </div>
+                <div class="stat-value counter-value">{{ orders_today }}</div>
+                <div class="stat-label">Order Masuk</div>
+                <div class="stat-sub">Total order diterima hari ini</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/></svg>
+                    </div>
+                    <span class="stat-trend neutral">⟳ Proses</span>
+                </div>
+                <div class="stat-value counter-value">{{ orders_in_progress }}</div>
+                <div class="stat-label">Dalam Proses</div>
+                <div class="stat-sub">Sedang dikerjakan karyawan</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="stat-trend up">✓ Selesai</span>
+                </div>
+                <div class="stat-value counter-value">{{ orders_done_today }}</div>
+                <div class="stat-label">Selesai Hari Ini</div>
+                <div class="stat-sub">Sudah bisa diambil customer</div>
+            </div>
+            <div class="stat-card amber">
+                <div class="stat-header">
+                    <div class="stat-icon amber">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <span class="stat-trend neutral">Bulan Ini</span>
+                </div>
+                <div class="stat-value counter-value">{{ orders_month }}</div>
+                <div class="stat-label">Order Bulan Ini</div>
+                <div class="stat-sub">Akumulasi order berjalan</div>
+            </div>
+        </div>
+
+        <!-- ROW 2: FINANCIAL (3 cards) -->
+        <div class="sec-label fi fi-2">Keuangan Bulan Ini</div>
+        <div class="stats-grid-3 fi fi-3">
+            <div class="financial-card">
+                <div class="fin-header">
+                    <div class="fin-icon" style="background:var(--gray-100)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <div class="fin-label">Total Omset</div>
+                        <div style="font-size:10px;color:var(--gray-400)">Gross revenue bulan berjalan</div>
+                    </div>
+                </div>
+                <div class="fin-value" style="color:var(--gray-900)">Rp {{ total_omset|floatformat:0|default:"0" }}</div>
+                <div class="fin-bar"><div class="fin-bar-fill" style="width:100%;background:linear-gradient(90deg,#DC2626,#EA580C)"></div></div>
+            </div>
+            <div class="financial-card">
+                <div class="fin-header">
+                    <div class="fin-icon" style="background:var(--green-soft)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <div class="fin-label">Uang Masuk</div>
+                        <div style="font-size:10px;color:var(--gray-400)">Sudah dibayar (PAID)</div>
+                    </div>
+                </div>
+                <div class="fin-value" style="color:var(--green)">Rp {{ cash_received|floatformat:0|default:"0" }}</div>
+                <div class="fin-bar"><div class="fin-bar-fill" style="width:75%;background:var(--green)"></div></div>
+            </div>
+            <div class="financial-card">
+                <div class="fin-header">
+                    <div class="fin-icon" style="background:var(--red-soft)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                    </div>
+                    <div>
+                        <div class="fin-label">Piutang</div>
+                        <div style="font-size:10px;color:var(--gray-400)">Belum dibayar (UNPAID)</div>
+                    </div>
+                </div>
+                <div class="fin-value" style="color:var(--red)">Rp {{ piutang|floatformat:0|default:"0" }}</div>
+                <div class="fin-bar"><div class="fin-bar-fill" style="width:25%;background:var(--red)"></div></div>
+            </div>
+        </div>
+
+        <!-- ROW 3: DATABASE STATS (4 cards) -->
+        <div class="sec-label fi fi-3">Database & Sistem</div>
+        <div class="stats-grid fi fi-3">
+            <div class="stat-card amber">
+                <div class="stat-header">
+                    <div class="stat-icon amber">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <span class="stat-trend neutral">Total</span>
+                </div>
+                <div class="stat-value counter-value">{{ total_customers }}</div>
+                <div class="stat-label">Pelanggan</div>
+                <div class="stat-sub">Terdaftar di sistem</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    </div>
+                    <span class="stat-trend up">Aktif</span>
+                </div>
+                <div class="stat-value counter-value">{{ total_packages }}</div>
+                <div class="stat-label">Paket Aktif</div>
+                <div class="stat-sub">Tersedia untuk customer</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </div>
+                    <span class="stat-trend neutral">Staff</span>
+                </div>
+                <div class="stat-value counter-value">{{ total_karyawan }}</div>
+                <div class="stat-label">Karyawan</div>
+                <div class="stat-sub">Aktif bekerja</div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-header">
+                    <div class="stat-icon red">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </div>
+                    <span class="stat-trend {% if critical_feedback_count > 0 %}down{% else %}neutral{% endif %}">
+                        {% if critical_feedback_count > 0 %}⚠ {{ critical_feedback_count }} Kritis{% else %}OK{% endif %}
+                    </span>
+                </div>
+                <div class="stat-value counter-value">{{ feedback_count }}</div>
+                <div class="stat-label">Feedback</div>
+                <div class="stat-sub">Bulan ini</div>
+            </div>
+        </div>
+
+        <!-- MAIN GRID: LEFT (actions + table) | RIGHT (alerts + mini stats) -->
+        <div class="main-grid fi fi-4">
+
+            <!-- LEFT COLUMN -->
+            <div>
+                <!-- AKSI CEPAT -->
+                <div class="sec-label" style="margin-top:4px">Aksi Cepat</div>
+                <div class="action-grid" style="margin-bottom:12px">
+                    <a href="{% url 'packages:package_list' %}" class="action-card" id="action-packages">
+                        <div class="action-card-icon" style="background:var(--red-soft)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                        </div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Paket Laundry</div>
+                            <div class="action-card-sub">Kelola {{ total_packages }} paket aktif</div>
+                        </div>
+                        <span class="action-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                    </a>
+
+                    <a href="{% url 'accounts:karyawan_list' %}" class="action-card" id="action-employees">
+                        <div class="action-card-icon" style="background:var(--blue-soft)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Manajemen Karyawan</div>
+                            <div class="action-card-sub">{{ total_karyawan }} karyawan terdaftar</div>
+                        </div>
+                        <span class="action-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                    </a>
+
+                    <a href="{% url 'reports:dashboard' %}" class="action-card" id="action-reports">
+                        <div class="action-card-icon" style="background:#ECFDF5">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Business Reports</div>
+                            <div class="action-card-sub">Laporan, grafik & tren bisnis</div>
+                        </div>
+                        <span class="action-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                    </a>
+
+                    <a href="{% url 'orders:order_list_karyawan' %}" class="action-card" id="action-orders">
+                        <div class="action-card-icon" style="background:var(--amber-soft)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                        </div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Semua Order</div>
+                            <div class="action-card-sub">Daftar order aktif & riwayat</div>
+                        </div>
+                        <span class="action-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                    </a>
+
+                    <a href="{% url 'orders:order_create_walkin' %}" class="action-card" id="action-walkin">
+                        <div class="action-card-icon" style="background:var(--purple-soft)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Pesanan Walk-In</div>
+                            <div class="action-card-sub">Input pesanan customer langsung</div>
+                        </div>
+                        <span class="action-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                    </a>
+
+                    <a href="{% url 'reports:dashboard' %}" class="action-card" id="action-feedback">
+                        <div class="action-card-icon" style="background:var(--red-soft)">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        </div>
+                        <div class="action-card-body">
+                            <div class="action-card-title">Pantau Feedback</div>
+                            <div class="action-card-sub">{{ feedback_count }} feedback, {{ critical_feedback_count }} butuh atensi</div>
+                        </div>
+                        <span class="action-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                    </a>
+                </div>
+
+                <!-- RECENT ORDERS TABLE -->
+                <div class="sec-label">Pesanan Terakhir</div>
+                <div class="table-card">
+                    <div class="table-card-head">
+                        <h3>Pesanan Terakhir</h3>
+                        <a href="{% url 'orders:order_list_karyawan' %}">
+                            Lihat Semua
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                    <div style="overflow-x:auto">
+                        <table class="od-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode Nota</th>
+                                    <th>Customer</th>
+                                    <th>Paket</th>
+                                    <th>Total</th>
+                                    <th>Progress</th>
+                                    <th>Bayar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td><span class="mono">{{ order.kode_nota }}</span></td>
+                                    <td style="font-weight:600">{{ order.nama_customer }}</td>
+                                    <td style="color:var(--gray-600)">{{ order.paket.name }}</td>
+                                    <td style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700">Rp {{ order.total_harga|floatformat:0 }}</td>
+                                    <td>
+                                        <span class="pill {% if order.progress_status == 'DIAMBIL' %}pill-green{% elif order.progress_status == 'SELESAI' %}pill-blue{% elif order.progress_status == 'DITERIMA' %}pill-gray{% else %}pill-amber{% endif %}">
+                                            {{ order.get_progress_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pill {% if order.payment_status == 'PAID' %}pill-green{% else %}pill-red{% endif %}">
+                                            {{ order.get_payment_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" style="text-align:center;padding:28px 14px;color:var(--gray-400)">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px;display:block;opacity:0.3"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                                        Belum ada pesanan. Mulai terima order sekarang!
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right-panel">
+
+                <!-- ALERT / STATUS CARD -->
+                <div class="alert-card">
+                    <div class="sec-label" style="margin-bottom:8px">Status & Perhatian</div>
+                    <div class="alert-item">
+                        <span class="alert-dot {% if orders_in_progress > 0 %}amber{% else %}green{% endif %}"></span>
+                        <span class="alert-text">Order dalam proses</span>
+                        <span class="alert-badge {% if orders_in_progress > 0 %}pill-amber{% else %}pill-green{% endif %} pill">{{ orders_in_progress }}</span>
+                    </div>
+                    <div class="alert-item">
+                        <span class="alert-dot {% if critical_feedback_count > 0 %}red{% else %}green{% endif %}"></span>
+                        <span class="alert-text">Feedback kritis</span>
+                        <span class="alert-badge {% if critical_feedback_count > 0 %}pill-red{% else %}pill-green{% endif %} pill">{{ critical_feedback_count }}</span>
+                    </div>
+                    <div class="alert-item">
+                        <span class="alert-dot green"></span>
+                        <span class="alert-text">Sistem operasional</span>
+                        <span class="alert-badge pill-green pill">Online</span>
+                    </div>
+                    <div class="alert-item">
+                        <span class="alert-dot amber"></span>
+                        <span class="alert-text">Order selesai hari ini</span>
+                        <span class="alert-badge pill-blue pill">{{ orders_done_today }}</span>
+                    </div>
+                </div>
+
+                <!-- PIUTANG PROGRESS -->
+                <div class="alert-card">
+                    <div class="sec-label" style="margin-bottom:10px">Rasio Keuangan</div>
+                    <div style="margin-bottom:10px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                            <span style="font-size:11px;font-weight:700;color:var(--gray-600)">Uang Masuk</span>
+                            <span style="font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--green)">Rp {{ cash_received|floatformat:0|default:"0" }}</span>
+                        </div>
+                        <div class="fin-bar" style="margin-top:0">
+                            <div class="fin-bar-fill" style="width:75%;background:var(--green)"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:10px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                            <span style="font-size:11px;font-weight:700;color:var(--gray-600)">Piutang</span>
+                            <span style="font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--red)">Rp {{ piutang|floatformat:0|default:"0" }}</span>
+                        </div>
+                        <div class="fin-bar" style="margin-top:0">
+                            <div class="fin-bar-fill" style="width:25%;background:var(--red)"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                            <span style="font-size:11px;font-weight:700;color:var(--gray-600)">Total Omset</span>
+                            <span style="font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--gray-900)">Rp {{ total_omset|floatformat:0|default:"0" }}</span>
+                        </div>
+                        <div class="fin-bar" style="margin-top:0">
+                            <div class="fin-bar-fill" style="width:100%;background:linear-gradient(90deg,#DC2626,#EA580C)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK SUMMARY RING STATS -->
+                <div class="alert-card">
+                    <div class="sec-label" style="margin-bottom:10px">Ringkasan Cepat</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                        <div style="background:var(--red-soft);border-radius:10px;padding:10px;text-align:center">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--red)">{{ orders_today }}</div>
+                            <div style="font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Order Hari Ini</div>
+                        </div>
+                        <div style="background:var(--green-soft);border-radius:10px;padding:10px;text-align:center">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--green)">{{ orders_done_today }}</div>
+                            <div style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Selesai</div>
+                        </div>
+                        <div style="background:var(--amber-soft);border-radius:10px;padding:10px;text-align:center">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--amber)">{{ orders_month }}</div>
+                            <div style="font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Bulan Ini</div>
+                        </div>
+                        <div style="background:var(--blue-soft);border-radius:10px;padding:10px;text-align:center">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--blue)">{{ total_customers }}</div>
+                            <div style="font-size:9px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px">Pelanggan</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="od-footer">
+        <span>&copy; {{ today|date:"Y" }} <strong>JOSS LAUNDRY</strong> &mdash; Semua hak dilindungi.</span>
+        <span style="display:flex;align-items:center;gap:5px">
+            <span class="live-dot"></span> Sistem Online
+        </span>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Counter animation
+    document.querySelectorAll('.counter-value').forEach(el => {
+        const target = parseInt(el.textContent) || 0;
+        if (!target) return;
+        let cur = 0;
+        const inc = Math.max(1, Math.ceil(target / 25));
+        const t = setInterval(() => {
+            cur = Math.min(cur + inc, target);
+            el.textContent = cur.toLocaleString('id-ID');
+            if (cur >= target) clearInterval(t);
+        }, 28);
+    });
+
+    // Live clock
+    const tick = () => {
+        const now = new Date();
+        const d = now.toLocaleDateString('id-ID', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+        const t = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        const el = document.getElementById('live-time');
+        if (el) el.textContent = `${d} ${t}`;
+    };
+    tick();
+    setInterval(tick, 1000);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+        if (!e.altKey) return;
+        const map = {'1':'action-packages','2':'action-employees','3':'action-reports','4':'action-orders','5':'action-walkin'};
+        if (map[e.key]) { const el = document.getElementById(map[e.key]); if (el) location.href = el.href; }
+    });
+});
+</script>
 {% endblock %}

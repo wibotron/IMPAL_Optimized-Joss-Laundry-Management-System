@@ -1,16 +1,578 @@
 {% extends 'base.html' %}
-{% block title %}Hapus Karyawan{% endblock %}
+{% block title %}Konfirmasi Hapus Karyawan - Joss Laundry{% endblock %}
+
 {% block content %}
-<div class="max-w-md mx-auto px-4 py-16 text-center">
-    <div class="bg-white rounded-xl shadow p-6">
-        <div class="text-5xl mb-4">⚠️</div>
-        <h2 class="text-2xl font-bold mb-2">Konfirmasi Hapus</h2>
-        <p class="mb-6">Yakin hapus <strong>{{ karyawan.full_name }}</strong>?</p>
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg mr-2">Ya, Hapus</button>
-            <a href="{% url 'accounts:karyawan_list' %}" class="bg-gray-300 px-4 py-2 rounded-lg">Batal</a>
-        </form>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+<style>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    :root {
+        --red: #C8251F;
+        --red-deep: #A01A15;
+        --red-glow: rgba(200, 37, 31, 0.14);
+        --red-soft: rgba(200, 37, 31, 0.07);
+        --gold: #A87B00;
+        --gold-dim: rgba(168, 123, 0, 0.08);
+        --gold-border: rgba(168, 123, 0, 0.28);
+        --bg: #FAF7F4;
+        --surface: #FFFFFF;
+        --surface-2: #F5F0EB;
+        --border: rgba(26, 26, 26, 0.1);
+        --border-hover: rgba(26, 26, 26, 0.2);
+        --ink: #1A1A1A;
+        --ink-dim: rgba(26, 26, 26, 0.5);
+        --muted: #777777;
+        --warning-bg: rgba(200, 37, 31, 0.04);
+        --warning-border: rgba(200, 37, 31, 0.18);
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .joss-page {
+        font-family: 'Barlow', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        padding: 72px 24px 100px;
+        position: relative;
+        overflow: hidden;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ── NOISE TEXTURE ── */
+    .joss-page::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.3;
+    }
+
+    /* ── AMBIENT GLOWS ── */
+    .glow-red {
+        position: fixed;
+        top: -180px;
+        left: -180px;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(200, 37, 31, 0.07) 0%, transparent 65%);
+        pointer-events: none;
+        z-index: 0;
+        animation: glowFloat 9s ease-in-out infinite;
+    }
+
+    .glow-gold {
+        position: fixed;
+        bottom: -200px;
+        right: -150px;
+        width: 650px;
+        height: 650px;
+        background: radial-gradient(circle, rgba(168, 123, 0, 0.06) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: glowFloat2 12s ease-in-out infinite;
+    }
+
+    @keyframes glowFloat {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(50px, 35px);
+        }
+    }
+
+    @keyframes glowFloat2 {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(-35px, -50px);
+        }
+    }
+
+    /* ── DOT GRID BACKGROUND ── */
+    .dot-grid {
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(26, 26, 26, 0.06) 1px, transparent 1px);
+        background-size: 28px 28px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* ── CONTENT CONTAINER ── */
+    .joss-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 580px;
+        margin: 0 auto;
+        animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(28px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ── CARD ── */
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow:
+            0 12px 40px rgba(0, 0, 0, 0.08),
+            0 1px 4px rgba(0, 0, 0, 0.04);
+        position: relative;
+    }
+
+    /* top accent bar */
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--red) 0%, #E8573C 50%, #B81B15 100%);
+        z-index: 2;
+    }
+
+    /* ── CARD HEADER ── */
+    .card-header {
+        padding: 38px 40px 28px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    /* decorative corner circle */
+    .card-header::after {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, var(--red-soft) 0%, transparent 65%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .header-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(200, 37, 31, 0.06);
+        border: 1px solid rgba(200, 37, 31, 0.15);
+        border-radius: 100px;
+        padding: 4px 12px 4px 8px;
+        margin-bottom: 14px;
+    }
+
+    .eyebrow-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--red);
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.35;
+            transform: scale(0.6);
+        }
+    }
+
+    .header-eyebrow span {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--red);
+    }
+
+    .card-header h1 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(2rem, 4.5vw, 2.8rem);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: 0.03em;
+        margin: 0 0 6px;
+        color: var(--ink);
+    }
+
+    .card-header h1 .accent {
+        color: var(--red);
+    }
+
+    .card-header p {
+        font-size: 0.88rem;
+        color: var(--muted);
+        margin: 0;
+        font-weight: 400;
+    }
+
+    /* ── CARD BODY ── */
+    .card-body {
+        padding: 36px 40px 40px;
+    }
+
+    /* ── WARNING BOX ── */
+    .warning-box {
+        background: var(--warning-bg);
+        border: 1.5px solid var(--warning-border);
+        border-left: 4px solid var(--red);
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 28px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .warning-icon {
+        font-size: 1.8rem;
+        line-height: 1;
+        flex-shrink: 0;
+        animation: warningShake 2.5s ease-in-out infinite;
+    }
+
+    @keyframes warningShake {
+
+        0%,
+        90%,
+        100% {
+            transform: rotate(0);
+        }
+
+        92% {
+            transform: rotate(-8deg);
+        }
+
+        94% {
+            transform: rotate(8deg);
+        }
+
+        96% {
+            transform: rotate(-5deg);
+        }
+
+        98% {
+            transform: rotate(5deg);
+        }
+    }
+
+    .warning-text {
+        flex-grow: 1;
+    }
+
+    .warning-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--red-deep);
+        margin: 0 0 6px;
+        letter-spacing: 0.01em;
+    }
+
+    .warning-desc {
+        font-size: 0.85rem;
+        color: var(--ink-dim);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .target-name {
+        display: inline-block;
+        background: rgba(26, 26, 26, 0.05);
+        border: 1px solid var(--border);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+    /* ── DIVIDER ── */
+    .form-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 28px 0;
+    }
+
+    /* ── ACTIONS ── */
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+    }
+
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex: 1;
+        padding: 13px 24px;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-family: 'Barlow', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        letter-spacing: 0.02em;
+    }
+
+    .btn-cancel:hover {
+        background: var(--surface-2);
+        border-color: var(--border-hover);
+        color: var(--ink);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-danger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex: 1;
+        padding: 13px 24px;
+        background: var(--red);
+        border: none;
+        border-radius: 12px;
+        font-family: 'Barlow', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #ffffff;
+        cursor: pointer;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 18px var(--red-glow);
+    }
+
+    .btn-danger::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+
+    .btn-danger:hover {
+        background: var(--red-deep);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px var(--red-glow);
+    }
+
+    .btn-danger:hover::after {
+        transform: translateX(100%);
+    }
+
+    .btn-danger:active {
+        transform: translateY(0);
+    }
+
+    .btn-danger svg,
+    .btn-cancel svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 520px) {
+        .joss-page {
+            padding: 36px 16px;
+        }
+
+        .card-header,
+        .card-body {
+            padding: 30px 24px;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            gap: 10px;
+        }
+
+        .btn-cancel,
+        .btn-danger {
+            width: 100%;
+            flex: none;
+        }
+    }
+</style>
+
+<div class="joss-page">
+    <div class="dot-grid"></div>
+    <div class="glow-red"></div>
+    <div class="glow-gold"></div>
+
+    <div class="joss-container">
+
+        <!-- FORM CARD -->
+        <div class="form-card">
+
+            <!-- HEADER -->
+            <div class="card-header">
+                <div class="header-eyebrow">
+                    <div class="eyebrow-dot"></div>
+                    <span>Tindakan Destruktif</span>
+                </div>
+                <h1>Apakah Anda <span class="accent">Yakin?</span></h1>
+                <p>Mohon konfirmasi keputusan Anda di bawah ini.</p>
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body">
+
+                <!-- WARNING BOX -->
+                <div class="warning-box">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-text">
+                        <h4 class="warning-title">Konfirmasi Penghapusan Akun</h4>
+                        <p class="warning-desc">
+                            Anda akan menghapus secara permanen data karyawan atas nama
+                            <span class="target-name">{{ karyawan.full_name }}</span> dari sistem.
+                            Semua akses login yang dimiliki oleh akun ini akan segera dinonaktifkan.
+                        </p>
+                    </div>
+                </div>
+
+                <p
+                    style="font-size: 0.88rem; color: var(--muted); text-align: center; margin-bottom: 24px; line-height: 1.6;">
+                    Tindakan ini bersifat <strong>permanen</strong> dan data yang terhapus tidak dapat dipulihkan
+                    kembali oleh sistem.
+                </p>
+
+                <div class="form-divider"></div>
+
+                <form method="post" id="delete-form">
+                    {% csrf_token %}
+                    <div class="form-actions">
+
+                        <a href="{% url 'accounts:karyawan_list' %}" class="btn-cancel" id="btn-batal">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Batal
+                        </a>
+
+                        <button type="submit" class="btn-danger" id="btn-hapus">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Ya, Hapus Permanen
+                        </button>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const deleteForm = document.getElementById('delete-form');
+        const btnHapus = document.getElementById('btn-hapus');
+        const btnBatal = document.getElementById('btn-batal');
+
+        /* ── Ripple Effect pada tombol Hapus ── */
+        if (btnHapus) {
+            btnHapus.addEventListener('click', function (e) {
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.cssText = `
+          position:absolute; border-radius:50%;
+          width:${size}px; height:${size}px;
+          left:${e.clientX - rect.left - size / 2}px;
+          top:${e.clientY - rect.top - size / 2}px;
+          background:rgba(255,255,255,0.25);
+          transform:scale(0); animation:ripple 0.55s linear;
+          pointer-events:none;
+        `;
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        }
+
+        /* ── Submit Loading State ── */
+        if (deleteForm && btnHapus) {
+            deleteForm.addEventListener('submit', () => {
+                btnHapus.disabled = true;
+                if (btnBatal) btnBatal.style.pointerEvents = 'none';
+                btnHapus.innerHTML = `
+          <svg style="animation:spin 0.8s linear infinite;width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/>
+          </svg>
+          Menghapus...
+        `;
+            });
+        }
+    });
+</script>
+
+<style>
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 {% endblock %}

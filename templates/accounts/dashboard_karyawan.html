@@ -1,34 +1,1020 @@
-{% extends 'base.html' %}
-{% block title %}Karyawan Dashboard{% endblock %}
-{% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold">Dashboard Karyawan</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        <a href="{% url 'orders:order_create_walkin' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">🛒</div>
-            <h3 class="font-bold">Pesanan Walk-in</h3>
-            <p class="text-sm text-gray-500">Input order baru</p>
-        </a>
-        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">👁️</div>
-            <h3 class="font-bold">Lihat Order</h3>
-            <p class="text-sm text-gray-500">Kelola semua pesanan</p>
-        </a>
-        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">💰</div>
-            <h3 class="font-bold">Update Payment</h3>
-            <p class="text-sm text-gray-500">Konfirmasi pembayaran</p>
-        </a>
-        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">⚙️</div>
-            <h3 class="font-bold">Update Progress</h3>
-            <p class="text-sm text-gray-500">Ubah status cucian</p>
-        </a>
-        <a href="{% url 'orders:order_list_karyawan' %}" class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
-            <div class="text-4xl text-brand-red">💬</div>
-            <h3 class="font-bold">Respons Feedback</h3>
-            <p class="text-sm text-gray-500">Balas pelanggan</p>
-        </a>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOSS LAUNDRY — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #C8251F;
+      --red-deep: #A01A15;
+      --red-glow: rgba(200,37,31,0.14);
+      --red-soft: rgba(200,37,31,0.07);
+      --bg: #FAF7F4;
+      --surface: #FFFFFF;
+      --surface-2: #F5F0EB;
+      --surface-3: #EDE8E1;
+      --border: rgba(26,26,26,0.09);
+      --border-strong: rgba(26,26,26,0.16);
+      --text: #1A1A1A;
+      --text-dim: rgba(26,26,26,0.5);
+      --text-muted: #888;
+      --gold: #A87B00;
+      --gold-bg: rgba(168,123,0,0.08);
+      --green: #16a34a;
+      --green-bg: rgba(22,163,74,0.08);
+      --blue: #3b82f6;
+      --blue-bg: rgba(59,130,246,0.08);
+      --orange: #f97316;
+      --purple: #8b5cf6;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--bg) url('https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=2000&auto=format&fit=crop') center/cover fixed no-repeat;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      animation: pageLoadIn .6s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes pageLoadIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: rgba(250,247,244,0.86);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main, nav, .hero, .hero-card, .section, .stats, .card, .od, .od-header, .od-body, .od-footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .bg-glow {
+      position: fixed; top: -180px; left: -180px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(200,37,31,0.07) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+      animation: bgFloat 9s ease-in-out infinite;
+    }
+    @keyframes bgFloat { 0%,100%{transform:translate(0,0)} 50%{transform:translate(50px,35px)} }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(250,247,244,0.93);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      animation: slideDown .5s cubic-bezier(.22,1,.36,1) both;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-100%)} to{opacity:1;transform:translateY(0)} }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.55rem; letter-spacing: .08em;
+      display: flex; align-items: center; gap: 5px;
+      text-decoration: none; color: var(--text); user-select: none;
+      transition: transform .2s cubic-bezier(.22,1,.36,1);
+    }
+    .logo:hover { transform: scale(1.02); }
+    .logo .red { color: var(--red); }
+    .logo .star { color: var(--gold); font-size: .85rem; animation: spin 7s linear infinite; }
+    @keyframes spin { to{ transform:rotate(360deg) } }
+
+    .nav-right { display: flex; align-items: center; gap: 6px; }
+
+    .badge-role {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; padding: 3px 10px; border-radius: 100px;
+      backdrop-filter: blur(8px);
+      animation: fadeIn .4s .15s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .badge-karyawan {
+      background: var(--blue-bg); border: 1px solid rgba(59,130,246,.22); color: var(--blue);
+    }
+    .badge-owner {
+      background: var(--gold-bg); border: 1px solid rgba(168,123,0,.22); color: var(--gold);
+    }
+    .nav-link {
+      background: none; border: none; color: var(--text-dim);
+      font-family: 'Barlow', sans-serif; font-size: .86rem; font-weight: 500;
+      padding: 7px 13px; border-radius: 8px; cursor: pointer;
+      transition: color .2s, background .2s; text-decoration: none;
+      position: relative;
+    }
+    .nav-link:hover { color: var(--text); background: rgba(26,26,26,.08); }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      width: 0; height: 2px;
+      background: var(--red);
+      transition: width .3s ease, left .3s ease;
+      border-radius: 2px;
+    }
+    .nav-link:hover::after { width: 100%; left: 0; }
+    .btn-logout {
+      background: var(--red); color: #fff;
+      font-family: 'Barlow', sans-serif; font-size: .78rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase; border: none;
+      padding: 7px 18px; border-radius: 8px; cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s; text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-logout::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,.1);
+      transition: left .3s cubic-bezier(.22,1,.36,1);
+    }
+    .btn-logout:hover {
+      background: var(--red-deep);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px var(--red-glow);
+    }
+    .btn-logout:hover::before { left: 100%; }
+
+    /* ─── MAIN ─── */
+    main {
+      position: relative; z-index: 1;
+      max-width: 1280px; margin: 0 auto;
+      padding: 28px 40px 48px;
+      animation: fadeUp .6s cubic-bezier(.22,1,.36,1);
+    }
+
+    /* ─── HERO COMPACT ─── */
+    .hero {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; margin-bottom: 24px;
+      animation: fadeUp .6s .15s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    .hero-left {}
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(200,37,31,.05); border: 1px solid var(--border);
+      border-radius: 100px; padding: 4px 12px 4px 7px; margin-bottom: 10px;
+      transition: all .25s cubic-bezier(.22,1,.36,1);
+    }
+    .hero-eyebrow:hover { background: rgba(200,37,31,.08); border-color: var(--red); transform: translateX(2px); }
+    .hero-eyebrow .dot {
+      width: 6px; height: 6px; background: var(--blue);
+      border-radius: 50%; animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.45;transform:scale(.7)} }
+    .hero-eyebrow span { font-size: .7rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem,4vw,3.6rem);
+      font-weight: 400; line-height: .96; letter-spacing: .04em;
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    .hero:hover h1 { transform: scale(1.02); }
+    .hero h1 .accent { color: var(--red); }
+    .hero h1 .thin { color: var(--text-dim); }
+    .hero-sub { margin-top: 8px; font-size: .88rem; color: var(--text-muted); max-width: 400px; line-height: 1.55; }
+
+    /* ─── GREETING DATE ─── */
+    .hero-date {
+      text-align: right; flex-shrink: 0;
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    .hero:hover .hero-date { transform: scale(1.05); }
+    .hero-date .date-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem; line-height: 1; color: var(--red); letter-spacing: .03em;
+    }
+    .hero-date .date-label { font-size: .72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+
+    /* ─── STATS GRID ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+      animation: fadeUp .6s .25s cubic-bezier(.22,1,.36,1) both;
+    }
+    .stats-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 6px;
+      box-shadow: var(--shadow-sm);
+      transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s;
+      position: relative; overflow: hidden;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--stat-color, var(--red));
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--stat-color, var(--red));
+      border-radius: 14px 14px 0 0;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .stat-card:hover::before { transform: scaleX(1); }
+
+    .stat-top { display: flex; align-items: center; justify-content: space-between; }
+    .stat-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--stat-bg, var(--red-soft));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .25s;
+    }
+    .stat-card:hover .stat-icon { transform: scale(1.15) rotate(5deg); background: var(--stat-color, var(--red)); opacity: 0.15; }
+    .stat-badge {
+      font-size: .65rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 100px;
+      background: var(--stat-bg, var(--red-soft));
+      color: var(--stat-color, var(--red));
+      border: 1px solid var(--stat-color, var(--red));
+      opacity: .7;
+      transition: opacity .25s;
+    }
+    .stat-card:hover .stat-badge { opacity: 1; }
+
+    .stat-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.1rem; line-height: 1; letter-spacing: .02em;
+      color: var(--stat-color, var(--red));
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    .stat-card:hover .stat-val { transform: scale(1.05); }
+    .stat-label { font-size: .73rem; color: var(--text-muted); font-weight: 500; letter-spacing: .02em; }
+    .stat-trend { font-size: .7rem; font-weight: 600; color: var(--green); display: flex; align-items: center; gap: 3px; }
+    .stat-trend.down { color: var(--red); }
+    .stat-trend.neutral { color: var(--text-muted); }
+
+    /* ─── SECTION HEADER ─── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; margin-top: 28px;
+    }
+    .section-title {
+      font-size: .7rem; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--text-muted);
+      display: flex; align-items: center; gap: 8px;
+      transition: color .25s;
+    }
+    .section-header:hover .section-title { color: var(--text-dim); }
+    .section-title::after {
+      content: ''; width: 24px; height: 1px; background: var(--border-strong);
+      transition: width .3s cubic-bezier(.22,1,.36,1);
+    }
+    .section-header:hover .section-title::after { width: 40px; }
+    .section-link {
+      font-size: .78rem; font-weight: 600; color: var(--red); text-decoration: none;
+      letter-spacing: .02em; transition: color .25s;
+      position: relative;
+    }
+    .section-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1px;
+      background: var(--red);
+      transition: width .3s cubic-bezier(.22,1,.36,1);
+    }
+    .section-link:hover { color: var(--red-deep); }
+    .section-link:hover::after { width: 100%; }
+
+    /* ─── QUICK ACTIONS GRID ─── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      animation: fadeUp .6s .35s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    .card {
+      position: relative; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px 16px 16px; cursor: pointer;
+      transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .25s, box-shadow .25s;
+      overflow: hidden; display: flex; flex-direction: column; gap: 12px;
+      text-decoration: none; color: inherit; box-shadow: var(--shadow-sm);
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: var(--card-accent, var(--red));
+      box-shadow: 0 12px 40px rgba(0,0,0,.12), 0 0 0 2px var(--card-accent, var(--red));
+    }
+    .card:active { transform: translateY(-3px); }
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,.1) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+    .card:hover::after { opacity: 1; }
+
+    .card-accent-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--card-accent, var(--red));
+      border-radius: 16px 16px 0 0; opacity: .7;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s cubic-bezier(.22,1,.36,1), opacity .25s;
+    }
+    .card:hover .card-accent-bar { transform: scaleX(1); opacity: 1; }
+
+    .card-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: var(--icon-bg, rgba(200,37,31,.08));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; flex-shrink: 0;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .25s, box-shadow .25s;
+    }
+    .card:hover .card-icon {
+      transform: scale(1.2) rotate(-8deg);
+      background: var(--icon-bg, rgba(200,37,31,.15));
+      box-shadow: 0 6px 16px rgba(0,0,0,.12);
+    }
+
+    .card-body { flex: 1; }
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem; letter-spacing: .04em; line-height: 1.1; margin-bottom: 4px;
+      transition: color .25s;
+    }
+    .card:hover .card-title { color: var(--card-accent, var(--red)); }
+    .card-desc { font-size: .75rem; color: var(--text-muted); line-height: 1.5; transition: color .25s; }
+    .card:hover .card-desc { color: var(--text-dim); }
+
+    .card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .card-count {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem; color: var(--card-accent, var(--red)); line-height: 1;
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    .card:hover .card-count { transform: scale(1.1); }
+    .card-count-label { font-size: .62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+    .card-arrow {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; color: var(--text-muted);
+      transition: background .2s, border-color .2s, color .2s, transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    .card:hover .card-arrow {
+      background: var(--card-accent, var(--red));
+      border-color: var(--card-accent, var(--red));
+      color: white;
+      transform: translate(4px,-4px);
+    }
+
+    /* card themes */
+    .card-1 { --card-accent:#C8251F; --card-shadow:rgba(200,37,31,.15); --icon-bg:rgba(200,37,31,.08); }
+    .card-2 { --card-accent:#A87B00; --card-shadow:rgba(168,123,0,.15); --icon-bg:rgba(168,123,0,.08); }
+    .card-3 { --card-accent:#16a34a; --card-shadow:rgba(22,163,74,.15); --icon-bg:rgba(22,163,74,.08); }
+    .card-4 { --card-accent:#3b82f6; --card-shadow:rgba(59,130,246,.15); --icon-bg:rgba(59,130,246,.08); }
+    .card-5 { --card-accent:#f97316; --card-shadow:rgba(249,115,22,.15); --icon-bg:rgba(249,115,22,.08); }
+
+    /* ─── DUAL PANEL ─── */
+    .dual-panel {
+      display: grid; grid-template-columns: 1fr 360px; gap: 16px;
+      margin-top: 0;
+      animation: fadeUp .6s .45s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    /* ─── TABLE PANEL ─── */
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);
+      transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .25s, box-shadow .25s;
+    }
+    .panel:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .panel-header {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background .25s;
+    }
+    .panel:hover .panel-header { background: rgba(255,255,255,.3); }
+    .panel-title { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text); transition: color .25s; }
+    .panel:hover .panel-title { color: var(--red); }
+    .panel-badge { font-size: .68rem; font-weight: 700; padding: 2px 9px; border-radius: 100px; transition: transform .25s cubic-bezier(.22,1,.36,1); }
+    .panel:hover .panel-badge { transform: scale(1.05); }
+    .panel-badge.red { background: var(--red-soft); color: var(--red); border: 1px solid rgba(200,37,31,.2); }
+    .panel-badge.gold { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(168,123,0,.2); }
+
+    /* ─── TABLE ─── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--surface-2); }
+    thead th {
+      padding: 9px 16px; text-align: left;
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-muted);
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+      transition: color .25s;
+    }
+    thead tr:hover th { color: var(--text-dim); }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s, transform .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover {
+      background: var(--surface-2);
+      transform: scaleX(1.01);
+      transform-origin: left;
+    }
+    td {
+      padding: 10px 16px; font-size: .82rem;
+      vertical-align: middle; white-space: nowrap;
+      transition: color .25s;
+    }
+    tbody tr:hover td { color: var(--text-dim); }
+    .td-id { font-family: 'Barlow', sans-serif; font-weight: 700; color: var(--red); font-size: .78rem; }
+    .td-name { font-weight: 600; max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+    .td-service { color: var(--text-dim); font-size: .78rem; }
+    .td-weight { font-weight: 600; }
+
+    /* STATUS PILLS */
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; padding: 3px 9px; border-radius: 100px;
+      transition: transform .25s cubic-bezier(.22,1,.36,1), opacity .25s;
+      cursor: default;
+    }
+    .pill:hover { transform: scale(1.05); }
+    .pill::before { 
+      content: ''; width: 5px; height: 5px; border-radius: 50%; 
+      background: currentColor; opacity: .7;
+      animation: blink-fast 1.5s infinite;
+    }
+    @keyframes blink-fast { 0%,100%{opacity:.7} 50%{opacity:.2} }
+    .pill-red { background: rgba(200,37,31,.08); color: var(--red); }
+    .pill-red:hover { background: rgba(200,37,31,.12); }
+    .pill-gold { background: var(--gold-bg); color: var(--gold); }
+    .pill-gold:hover { background: rgba(168,123,0,.15); }
+    .pill-green { background: var(--green-bg); color: var(--green); }
+    .pill-green:hover { background: rgba(22,163,74,.15); }
+    .pill-blue { background: var(--blue-bg); color: var(--blue); }
+    .pill-blue:hover { background: rgba(59,130,246,.15); }
+    .pill-gray { background: rgba(136,136,136,.1); color: var(--text-muted); }
+    .pill-gray:hover { background: rgba(136,136,136,.15); }
+
+    /* ─── PRIORITY LIST ─── */
+    .priority-list { padding: 0; max-height: 360px; overflow-y: auto; }
+    .priority-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .priority-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .priority-list::-webkit-scrollbar-thumb {
+      background: var(--border-strong); border-radius: 2px;
+      transition: background .25s;
+    }
+    .priority-list::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    .priority-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      transition: background .15s, border-color .15s, transform .15s; cursor: pointer;
+      position: relative;
+    }
+    .priority-item:last-child { border-bottom: none; }
+    .priority-item:hover {
+      background: var(--surface-2);
+      transform: translateX(4px);
+    }
+
+    .priority-rank {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .68rem; font-weight: 800; letter-spacing: .04em;
+      margin-top: 1px;
+      transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s, background .25s;
+    }
+    .rank-1 { background: rgba(200,37,31,.1); color: var(--red); box-shadow: 0 2px 8px rgba(200,37,31,.15); }
+    .rank-2 { background: var(--gold-bg); color: var(--gold); box-shadow: 0 2px 8px rgba(168,123,0,.12); }
+    .rank-3 { background: var(--green-bg); color: var(--green); box-shadow: 0 2px 8px rgba(22,163,74,.12); }
+    .rank-4 { background: var(--blue-bg); color: var(--blue); box-shadow: 0 2px 8px rgba(59,130,246,.12); }
+    .priority-item:hover .priority-rank { transform: scale(1.2) rotate(10deg); }
+
+    .priority-info { flex: 1; min-width: 0; }
+    .priority-order { font-weight: 700; font-size: .82rem; margin-bottom: 2px; transition: color .25s; }
+    .priority-item:hover .priority-order { color: var(--red); }
+    .priority-meta { font-size: .72rem; color: var(--text-muted); transition: color .25s; }
+    .priority-item:hover .priority-meta { color: var(--text-dim); }
+    .priority-time {
+      font-size: .7rem; font-weight: 600; color: var(--red); white-space: nowrap;
+      margin-left: auto; margin-top: 2px;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    @keyframes pulse-glow { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+    /* ─── PERFORMANCE BAND (Karyawan only) ─── */
+    .perf-band {
+      background: linear-gradient(135deg, var(--red) 0%, #8B1A15 100%);
+      border-radius: 14px; padding: 18px 20px; color: white;
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 0; position: relative; overflow: hidden;
+      box-shadow: 0 6px 24px var(--red-glow);
+      animation: fadeUp .6s .4s cubic-bezier(.22,1,.36,1) both;
+      transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s;
+    }
+    .perf-band:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(200,37,31,.25); }
+    .perf-band::before {
+      content: '🔥';
+      position: absolute; right: -10px; top: -10px;
+      font-size: 5rem; opacity: .07;
+      animation: float-glow 6s ease-in-out infinite;
+    }
+    @keyframes float-glow { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-15px)} }
+
+    .perf-item { text-align: center; padding: 0 16px; transition: transform .25s cubic-bezier(.22,1,.36,1); }
+    .perf-band:hover .perf-item { transform: scale(1.05); }
+    .perf-item + .perf-item { border-left: 1px solid rgba(255,255,255,.15); }
+    .perf-val { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; line-height: 1; letter-spacing: .03em; transition: transform .25s cubic-bezier(.22,1,.36,1); }
+    .perf-band:hover .perf-val { transform: scale(1.08); }
+    .perf-sub { font-size: .7rem; opacity: .7; text-transform: uppercase; letter-spacing: .07em; margin-top: 3px; }
+
+    /* ─── MOTIVATION STRIP ─── */
+    .motivation-strip {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 20px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: var(--shadow-sm);
+      animation: fadeUp .6s .5s cubic-bezier(.22,1,.36,1) both;
+      transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s, border-color .25s;
+    }
+    .motivation-strip:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--gold);
+    }
+    .motivation-icon { font-size: 1.8rem; flex-shrink: 0; transition: transform .3s cubic-bezier(.34,1.56,.64,1); animation: bounce 2s ease-in-out infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+    .motivation-strip:hover .motivation-icon { transform: scale(1.1); animation: none; }
+    .motivation-text { flex: 1; }
+    .motivation-quote { font-size: .88rem; font-weight: 600; color: var(--text); line-height: 1.45; transition: color .25s; }
+    .motivation-strip:hover .motivation-quote { color: var(--red); }
+    .motivation-author { font-size: .72rem; color: var(--text-muted); margin-top: 3px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border); padding: 16px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface);
+      box-shadow: 0 -2px 8px rgba(0,0,0,.04);
+      transition: background .25s;
+    }
+    footer:hover { background: rgba(255,255,255,.95); }
+    .footer-text { font-size: .76rem; color: var(--text-muted); transition: color .25s; }
+    footer:hover .footer-text { color: var(--text-dim); }
+    .footer-text strong { color: var(--red); font-weight: 700; }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px; font-size: .74rem;
+      color: var(--green); font-weight: 500;
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    footer:hover .status-pill { transform: translateX(2px); }
+    .dot-green {
+      width: 6px; height: 6px; background: var(--green); border-radius: 50%;
+      box-shadow: 0 0 5px var(--green);
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ─── GLOBAL SCROLL BEHAVIOR ─── */
+    * { scroll-behavior: smooth; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width:1100px) {
+      .cards-grid { grid-template-columns: repeat(3,1fr); }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .dual-panel { grid-template-columns: 1fr; }
+      .owner-extra { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width:768px) {
+      main { padding: 20px 18px 40px; }
+      nav { padding: 0 18px; }
+      footer { padding: 14px 18px; }
+      .cards-grid { grid-template-columns: repeat(2,1fr); }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .hero-date { display:none; }
+      .owner-extra { grid-template-columns: 1fr; }
+      .perf-band { grid-template-columns: 1fr; gap: 14px; }
+      .perf-item + .perf-item { border-left: none; border-top: 1px solid rgba(255,255,255,.15); padding-top: 14px; }
+      .badge-role, .nav-link:not(.btn-logout) { display:none; }
+      .view-tabs { display:none; }
+    }
+    @media (max-width:480px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── RIPPLE ─── */
+    .ripple { position:absolute; border-radius:50%; background:rgba(200,37,31,.07); transform:scale(0); animation:rippleAnim .5s linear; pointer-events:none; }
+    @keyframes rippleAnim { to{ transform:scale(4); opacity:0 } }
+
+    /* ─── VIEWS ─── */
+    .view { display: none; }
+    .view.active { display: block; }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <span class="red">JOSS</span>
+    <span class="star">★</span>
+    <span>LAUNDRY</span>
+  </a>
+  <div class="nav-right">
+    <div class="badge-role badge-karyawan">Karyawan</div>
+    <a href="#" class="nav-link">Dashboard</a>
+    <form method="POST" action="{% url 'accounts:logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="btn-logout" style="border:none;">Logout</button>
+    </form>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  KARYAWAN DASHBOARD                            -->
+<!-- ══════════════════════════════════════════════ -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow"><div class="dot"></div><span>Siap bekerja hari ini</span></div>
+      <h1>Halo,<br><span class="accent">{{ user.username|default:"Budi" }}</span><span class="thin">! 👋</span></h1>
+      <p class="hero-sub">Pantau antrian, kerjakan order, dan jaga kepuasan pelanggan hari ini.</p>
     </div>
-</div>
-{% endblock %}
+    <div class="hero-date">
+      <div class="date-big" id="live-date">1</div>
+      <div class="date-label" id="live-month">Jun 2026</div>
+    </div>
+  </div>
+
+  <!-- STATS 4-GRID -->
+  <div class="stats-grid">
+    <div class="stat-card" style="--stat-color:var(--red);--stat-bg:var(--red-soft)">
+      <div class="stat-top">
+        <div class="stat-icon">🧺</div>
+        <div class="stat-badge">Hari ini</div>
+      </div>
+      <div class="stat-val" data-count-up data-target="{{ orders_today|default:0 }}">0</div>
+      <div class="stat-label">Pesanan Masuk</div>
+      <div class="stat-trend">▲ 3 dari kemarin</div>
+    </div>
+
+    <div class="stat-card" style="--stat-color:var(--gold);--stat-bg:var(--gold-bg)">
+      <div class="stat-top">
+        <div class="stat-icon">⚙️</div>
+        <div class="stat-badge">Aktif</div>
+      </div>
+      <div class="stat-val" data-count-up data-target="{{ orders_in_progress|default:0 }}">0</div>
+      <div class="stat-label">Sedang Dicuci</div>
+      <div class="stat-trend neutral">— sama seperti jam 08:00</div>
+    </div>
+
+    <div class="stat-card" style="--stat-color:var(--green);--stat-bg:var(--green-bg)">
+      <div class="stat-top">
+        <div class="stat-icon">✅</div>
+        <div class="stat-badge">Selesai</div>
+      </div>
+      <div class="stat-val" data-count-up data-target="{{ orders_done_today|default:0 }}">0</div>
+      <div class="stat-label">Selesai Hari Ini</div>
+      <div class="stat-trend">▲ Bagus! Keep it up</div>
+    </div>
+
+    <div class="stat-card" style="--stat-color:var(--red);--stat-bg:rgba(200,37,31,.06)">
+      <div class="stat-top">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-badge">Mendesak</div>
+      </div>
+      <div class="stat-val" data-count-up data-target="{{ urgent_count|default:0 }}">0</div>
+      <div class="stat-label">Perlu Ditangani Segera</div>
+      <div class="stat-trend down">▼ Segera kerjakan!</div>
+    </div>
+  </div>
+
+  <!-- PERFORMANCE BAND -->
+  <div class="perf-band" style="margin-bottom:18px;">
+    <div class="perf-item">
+      <div class="perf-val" data-count-up data-target="{{ my_orders_this_week|default:0 }}">0</div>
+      <div class="perf-sub">Order minggu ini</div>
+    </div>
+    <div class="perf-item">
+      <div class="perf-val">{{ my_rating|default:"4.8" }}⭐</div>
+      <div class="perf-sub">Rating pelanggan</div>
+    </div>
+    <div class="perf-item">
+      <div class="perf-val" data-count-up data-target="{{ on_time_rate|default:0 }}">0</div>
+      <div class="perf-sub">% tepat waktu bulan ini</div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="section-header">
+    <div class="section-title">Aksi Cepat</div>
+  </div>
+  <div class="cards-grid" style="margin-bottom:18px;">
+    <a href="{% url 'orders:order_create_walkin' %}" class="card card-1" role="button" tabindex="0">
+      <div class="card-accent-bar"></div>
+      <div class="card-icon">🚶</div>
+      <div class="card-body">
+        <div class="card-title">Walk-in Baru</div>
+        <div class="card-desc">Terima pelanggan langsung</div>
+      </div>
+      <div class="card-footer">
+        <div><div class="card-count" data-count-up data-target="{{ walkin_today|default:0 }}">0</div><div class="card-count-label">Antrian</div></div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <a href="{% url 'orders:order_list_karyawan' %}" class="card card-2" role="button" tabindex="0">
+      <div class="card-accent-bar"></div>
+      <div class="card-icon">📄</div>
+      <div class="card-body">
+        <div class="card-title">Lihat Order</div>
+        <div class="card-desc">Semua pesanan aktif</div>
+      </div>
+      <div class="card-footer">
+        <div><div class="card-count" data-count-up data-target="{{ active_orders|default:0 }}">0</div><div class="card-count-label">Aktif</div></div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <a href="{% url 'orders:order_list_karyawan' %}" class="card card-3" role="button" tabindex="0">
+      <div class="card-accent-bar"></div>
+      <div class="card-icon">💳</div>
+      <div class="card-body">
+        <div class="card-title">Update Payment</div>
+        <div class="card-desc">Konfirmasi pembayaran</div>
+      </div>
+      <div class="card-footer">
+        <div><div class="card-count" data-count-up data-target="{{ pending_payment|default:0 }}">0</div><div class="card-count-label">Pending</div></div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <a href="{% url 'orders:order_list_karyawan' %}" class="card card-4" role="button" tabindex="0">
+      <div class="card-accent-bar"></div>
+      <div class="card-icon">🔄</div>
+      <div class="card-body">
+        <div class="card-title">Update Progress</div>
+        <div class="card-desc">Perbarui tahap proses</div>
+      </div>
+      <div class="card-footer">
+        <div><div class="card-count" data-count-up data-target="{{ need_update|default:0 }}">0</div><div class="card-count-label">Perlu update</div></div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+
+    <a href="{% url 'orders:order_list_karyawan' %}" class="card card-5" role="button" tabindex="0">
+      <div class="card-accent-bar"></div>
+      <div class="card-icon">💬</div>
+      <div class="card-body">
+        <div class="card-title">Feedback</div>
+        <div class="card-desc">Tanggapi keluhan pelanggan</div>
+      </div>
+      <div class="card-footer">
+        <div><div class="card-count" data-count-up data-target="{{ pending_feedback|default:0 }}">0</div><div class="card-count-label">Belum dibalas</div></div>
+        <div class="card-arrow">→</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- DUAL PANEL -->
+  <div class="dual-panel">
+    <!-- TABLE: PRIORITAS ORDER -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Order Prioritas — Perlu Dikerjakan</span>
+        <span class="panel-badge red">{{ urgent_count|default:urgent_orders|length|default:0 }} urgent</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Pelanggan</th>
+              <th>Layanan</th>
+              <th>Berat</th>
+              <th>Status</th>
+              <th>Batas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if urgent_orders %}
+              {% for order in urgent_orders %}
+              <tr>
+                <td class="td-id">{{ order.kode_nota }}</td>
+                <td class="td-name">{{ order.nama_customer }}</td>
+                <td class="td-service">{{ order.paket.nama }}</td>
+                <td class="td-weight">{{ order.berat }} kg</td>
+                <td>
+                  {% if order.progress_status == 'DITERIMA' %}
+                    <span class="pill pill-red">Menunggu</span>
+                  {% elif order.progress_status == 'DICUCI' %}
+                    <span class="pill pill-gold">Dicuci</span>
+                  {% elif order.progress_status == 'DIKERINGKAN' %}
+                    <span class="pill pill-blue">Dikeringkan</span>
+                  {% elif order.progress_status == 'DISETRIKA' %}
+                    <span class="pill pill-blue">Disetrika</span>
+                  {% elif order.progress_status == 'SELESAI' %}
+                    <span class="pill pill-green">Selesai</span>
+                  {% elif order.progress_status == 'DIAMBIL' %}
+                    <span class="pill pill-green">Diambil</span>
+                  {% else %}
+                    <span class="pill pill-gray">{{ order.progress_status }}</span>
+                  {% endif %}
+                </td>
+                <td style="font-size:.78rem">{{ order.tanggal_order|date:"H:i" }}</td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" style="text-align:center;color:var(--text-muted)">Tidak ada order prioritas.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SIDE: MOTIVASI + ANTRIAN -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <!-- MOTIVASI -->
+      <div class="motivation-strip">
+        <div class="motivation-icon">💪</div>
+        <div class="motivation-text">
+          <div class="motivation-quote" id="motivasi-text">"Kerja keras hari ini adalah investasi untuk hari esok."</div>
+          <div class="motivation-author">— Semangat, Tim JOSS!</div>
+        </div>
+      </div>
+
+      <!-- ANTREAN HARI INI -->
+      <div class="panel" style="flex:1;">
+        <div class="panel-header">
+          <span class="panel-title">Antrian Hari Ini</span>
+          <span class="panel-badge gold">{{ orders_today|default:0 }} order</span>
+        </div>
+        <div class="priority-list">
+          {% if orders_today_list %}
+            {% for order in orders_today_list %}
+            <div class="priority-item">
+              <div class="priority-rank {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% else %}rank-4{% endif %}">{{ forloop.counter }}</div>
+              <div class="priority-info">
+                <div class="priority-order">{{ order.kode_nota }} — {{ order.nama_customer }}</div>
+                <div class="priority-meta">{{ order.paket.nama }} · {{ order.berat }} kg</div>
+              </div>
+              <div class="priority-time">{{ order.tanggal_order|date:"H:i" }}{% if order.progress_status == 'DITERIMA' %} ⚡{% endif %}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="priority-item">
+              <div class="priority-info">
+                <div class="priority-order">Tidak ada antrian untuk hari ini.</div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-text">&copy; 2025 <strong>JOSS LAUNDRY</strong> — Semua hak dilindungi.</div>
+  <div class="status-pill"><div class="dot-green"></div>Sistem Online</div>
+</footer>
+
+<script>
+  /* ── LIVE DATE ── */
+  function setDate() {
+    const now = new Date();
+    const d = now.getDate();
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const m = months[now.getMonth()] + ' ' + now.getFullYear();
+    const dateEl = document.getElementById('live-date');
+    const monthEl = document.getElementById('live-month');
+    if (dateEl) dateEl.textContent = d;
+    if (monthEl) monthEl.textContent = m;
+  }
+  setDate();
+
+  /* ── SPARKLINE ── */
+  const sparkData = [42,55,38,70,65,80,90];
+  const maxVal = Math.max(...sparkData);
+  const sl = document.getElementById('sparkline');
+  if (sl) {
+    sparkData.forEach((v, i) => {
+      const bar = document.createElement('div');
+      bar.className = 'spark-bar' + (i === sparkData.length - 1 ? ' active' : '');
+      bar.style.height = Math.round((v / maxVal) * 100) + '%';
+      sl.appendChild(bar);
+    });
+  }
+
+  /* ── COUNT UP ── */
+  function countUp(el) {
+    const target = parseFloat(el.getAttribute('data-target') || '0');
+    const duration = 900;
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const val = target * ease;
+      el.textContent = Number.isInteger(target)
+        ? Math.floor(val).toLocaleString('id-ID')
+        : val.toFixed(1);
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  function runCountUp() {
+    document.querySelectorAll('[data-count-up]').forEach(countUp);
+  }
+  runCountUp();
+
+  /* ── RIPPLE ── */
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function(e) {
+      const rect = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+      this.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
+  });
+
+  /* ── KEYBOARD SUPPORT ── */
+  document.querySelectorAll('[role="button"]').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') e.currentTarget.click(); });
+  });
+
+  /* ── LOGOUT ── */
+  function handleLogout(btn) {
+    btn.textContent = '...'; btn.style.pointerEvents = 'none';
+  }
+
+  /* ── MOTIVASI RANDOM ── */
+  const quotes = [
+    '"Kerja keras hari ini adalah investasi untuk hari esok."',
+    '"Pelanggan puas adalah penghargaan terbesar kita."',
+    '"Setiap baju yang bersih adalah kebanggaan kita bersama."',
+    '"Semangat pagi! Hari ini kita bisa lebih baik dari kemarin."',
+    '"Kualitas terbaik dimulai dari niat yang tulus dalam bekerja."',
+  ];
+  const qEl = document.getElementById('motivasi-text');
+  if (qEl) qEl.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+</script>
+</body>
+</html>

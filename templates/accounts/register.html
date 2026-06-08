@@ -1,43 +1,1058 @@
-{% extends 'base.html' %}
-{% block title %}Register Customer{% endblock %}
-{% block content %}
-<div class="flex min-h-screen">
-    <div class="hidden lg:flex w-[40%] bg-dark-panel flex-col p-12 text-white justify-between">
-        <div><h1 class="text-4xl font-bold">JOSS ★</h1><h1 class="text-2xl font-semibold text-gray-300">Laundry</h1><p class="text-gray-400 text-sm mt-4">Bersih, Cepat, Joss!</p></div>
-        <div class="space-y-8">
-            <div class="flex gap-4"><span class="text-2xl">📦</span><div><h3 class="font-bold">Buat Order Online</h3><p class="text-gray-400 text-sm">Pilih paket tanpa antri</p></div></div>
-            <div class="flex gap-4"><span class="text-2xl">📡</span><div><h3 class="font-bold">Monitor Real-time</h3><p class="text-gray-400 text-sm">Pantau status cucian</p></div></div>
-            <div class="flex gap-4"><span class="text-2xl">⭐</span><div><h3 class="font-bold">Riwayat & Feedback</h3><p class="text-gray-400 text-sm">Akses histori dan beri ulasan</p></div></div>
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOSS LAUNDRY — Daftar Akun</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --red: #C8251F;
+            --red-deep: #A01A15;
+            --red-glow: rgba(200, 37, 31, 0.12);
+            --dark: #FAF7F4;
+            --dark-2: #FFFFFF;
+            --dark-3: #F5F0EB;
+            --white: #1A1A1A;
+            --white-dim: rgba(26, 26, 26, 0.5);
+            --white-border: rgba(26, 26, 26, 0.1);
+            --gold: #A87B00;
+            --muted: #777777;
+            --green: #16a34a;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background: var(--dark);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* ── NOISE TEXTURE ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.25;
+        }
+
+        /* ── LEFT PANEL (Brand Sidebar) ── */
+        .left-panel {
+            width: 420px;
+            flex-shrink: 0;
+            background: #111;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 56px 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 1100px) {
+            .left-panel {
+                display: flex;
+            }
+        }
+
+        /* animated red glow behind sidebar */
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(200, 37, 31, 0.3) 0%, transparent 65%);
+            animation: bgFloat 9s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -200px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(168, 123, 0, 0.15) 0%, transparent 65%);
+            animation: bgFloat2 12s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes bgFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0)
+            }
+
+            50% {
+                transform: translate(40px, 30px)
+            }
+        }
+
+        @keyframes bgFloat2 {
+
+            0%,
+            100% {
+                transform: translate(0, 0)
+            }
+
+            50% {
+                transform: translate(-30px, -40px)
+            }
+        }
+
+        .sidebar-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-sidebar {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.08em;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            animation: fadeUp 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .logo-sidebar .star {
+            color: var(--gold);
+        }
+
+        .logo-sidebar .red {
+            color: var(--red);
+        }
+
+        .sidebar-headline {
+            margin-top: 60px;
+            animation: fadeUp 0.7s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .sidebar-headline p {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 16px;
+        }
+
+        .sidebar-headline h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.8rem;
+            line-height: 1;
+            color: white;
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar-headline h2 span {
+            color: var(--red);
+        }
+
+        .sidebar-desc {
+            margin-top: 20px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.7;
+        }
+
+        /* feature list */
+        .feature-list {
+            margin-top: 52px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeUp 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 18px 20px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(200, 37, 31, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 3px;
+        }
+
+        .feature-text p {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.5;
+        }
+
+        /* step indicator */
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeUp 0.7s 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            width: 24px;
+            border-radius: 100px;
+            background: var(--red);
+        }
+
+        /* ── RIGHT PANEL (Form) ── */
+        .right-panel {
+            flex: 1;
+            background: var(--dark);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 48px;
+            position: relative;
+        }
+
+        @media (max-width: 640px) {
+            .right-panel {
+                padding: 32px 24px;
+            }
+        }
+
+        .right-inner {
+            width: 100%;
+            max-width: 560px;
+            margin: auto;
+            animation: fadeUp 0.8s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(28px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* top badge */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 48px;
+        }
+
+        .logo-right {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 0.08em;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .logo-right .red {
+            color: var(--red);
+        }
+
+        .logo-right .star {
+            color: var(--gold);
+            font-size: 0.8rem;
+        }
+
+        .login-cta {
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        .login-cta a {
+            color: var(--red);
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        .login-cta a:hover {
+            text-decoration: underline;
+        }
+
+        /* form header */
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        .form-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            background: rgba(200, 37, 31, 0.08);
+            border: 1px solid rgba(200, 37, 31, 0.2);
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 24px;
+        }
+
+        .form-header h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            line-height: 1;
+            letter-spacing: 0.02em;
+            margin-bottom: 12px;
+        }
+
+        .form-header p {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* progress bar */
+        .progress-bar {
+            height: 3px;
+            background: var(--white-border);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red), #E84040);
+            border-radius: 100px;
+            transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            width: 0%;
+        }
+
+        /* error banner */
+        .alert-error {
+            background: rgba(200, 37, 31, 0.08);
+            border: 1px solid rgba(200, 37, 31, 0.2);
+            border-left: 4px solid var(--red);
+            border-radius: 0 12px 12px 0;
+            padding: 16px 20px;
+            margin-bottom: 32px;
+            font-size: 0.85rem;
+            color: var(--red-deep);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ── FORM GRID ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-grid .col-full {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 500px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid .col-full {
+                grid-column: 1;
+            }
+        }
+
+        /* input group */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--white);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group label .req {
+            color: var(--red);
+        }
+
+        .input-group label .label-hint {
+            font-weight: 400;
+            color: var(--muted);
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrap .field-icon {
+            position: absolute;
+            left: 16px;
+            font-size: 1rem;
+            pointer-events: none;
+            color: var(--muted);
+            transition: color 0.2s;
+            z-index: 1;
+        }
+
+        .input-wrap.has-icon input,
+        .input-wrap.has-icon textarea,
+        .input-wrap.has-icon select {
+            padding-left: 44px;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            background: var(--dark-2);
+            border: 1.5px solid var(--white-border);
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem;
+            color: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 90px;
+            line-height: 1.5;
+        }
+
+        .input-group select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            padding-right: 44px;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--red);
+            box-shadow: 0 0 0 4px var(--red-glow);
+            background: white;
+        }
+
+        .input-group input:focus~.field-icon,
+        .input-group textarea:focus~.field-icon {
+            color: var(--red);
+        }
+
+        .input-group input.is-valid {
+            border-color: var(--green);
+        }
+
+        .input-group input.is-valid:focus {
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+        }
+
+        .field-error {
+            font-size: 0.78rem;
+            color: var(--red);
+            margin-top: 6px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ── PASSWORD STRENGTH ── */
+        .pwd-strength {
+            margin-top: 10px;
+        }
+
+        .pwd-bars {
+            display: flex;
+            gap: 4px;
+            height: 3px;
+            margin-bottom: 6px;
+        }
+
+        .pwd-bar {
+            flex: 1;
+            border-radius: 100px;
+            background: var(--white-border);
+            transition: background 0.3s;
+        }
+
+        .pwd-label {
+            font-size: 0.72rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* ── TOGGLE PASSWORD ── */
+        .toggle-pwd {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--muted);
+            transition: color 0.2s;
+            padding: 0;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .toggle-pwd:hover {
+            color: var(--white);
+        }
+
+        /* ── TERMS CHECKBOX ── */
+        .terms-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--white-border);
+            border-radius: 6px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+            background: var(--dark-2);
+        }
+
+        .custom-checkbox:checked {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .terms-label {
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .terms-label a {
+            color: var(--red);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .terms-label a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── SUBMIT BUTTON ── */
+        .btn-submit {
+            width: 100%;
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 14px;
+            font-family: 'Barlow', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            margin-top: 32px;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            background: var(--red-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px var(--red-glow);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn-submit .btn-arrow {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-submit:hover .btn-arrow {
+            transform: translateX(4px);
+        }
+
+        /* ripple */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(0);
+            animation: rippleGo 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleGo {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--white-border);
+            margin: 32px 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 24px;
+            line-height: 1.5;
+        }
+
+        .footer-note a {
+            color: var(--red);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+
+        .login-link {
+            color: var(--red);
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .login-link:hover {
+            color: var(--red-deep);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── LEFT: BRAND SIDEBAR ── -->
+    <div class="left-panel">
+        <div class="sidebar-content">
+            <a href="#" class="logo-sidebar">
+                <span class="red">JOSS</span>
+                <span class="star">★</span>
+                LAUNDRY
+            </a>
+        </div>
+
+        <div class="sidebar-content">
+            <div class="sidebar-headline">
+                <p>Bergabung Sekarang</p>
+                <h2>Buat Akun<br><span>Customer</span></h2>
+            </div>
+            <p class="sidebar-desc">Mulai pengalaman laundry modern yang mudah, cepat, dan bisa dipantau dari mana saja.
+            </p>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">📦</div>
+                    <div class="feature-text">
+                        <h4>Order Online</h4>
+                        <p>Pesan layanan laundry tanpa perlu antri, pilih paket sesuai kebutuhan.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📡</div>
+                    <div class="feature-text">
+                        <h4>Pantau Status</h4>
+                        <p>Lihat progres cucian secara real-time dari mana pun Anda berada.</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⭐</div>
+                    <div class="feature-text">
+                        <h4>Beri Ulasan</h4>
+                        <p>Berikan feedback agar kualitas layanan terus meningkat.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            <div class="step-indicator">
+                <div class="step-dot active" id="s1"></div>
+                <div class="step-dot" id="s2"></div>
+                <div class="step-dot" id="s3"></div>
+            </div>
         </div>
     </div>
-    <div class="w-full lg:w-[60%] bg-white flex flex-col justify-center p-8 lg:p-16">
-        <div class="max-w-xl mx-auto">
-            <div class="border border-orange-200 bg-orange-50 text-orange-600 text-xs font-bold px-3 py-1 rounded inline-block mb-4">🛍️ Daftar Pelanggan</div>
-            <h2 class="text-3xl font-extrabold text-gray-900 uppercase">Buat Akun Baru</h2>
-            <p class="text-gray-500 mb-8">Gratis dan mudah</p>
-            <form method="post">
+
+    <!-- ── RIGHT: FORM PANEL ── -->
+    <div class="right-panel">
+        <div class="right-inner">
+
+            <!-- top nav -->
+            <div class="top-nav">
+                <a href="#" class="logo-right">
+                    <span class="red">JOSS</span>
+                    <span class="star">★</span>
+                    LAUNDRY
+                </a>
+                <div class="login-cta">
+                    Sudah punya akun? <a href="{% url 'accounts:login' %}" class="login-link">Masuk</a>
+                </div>
+            </div>
+
+            <!-- header -->
+            <div class="form-header">
+                <div class="form-badge">🛍️ Daftar Customer</div>
+                <h1>Buat Akun Baru</h1>
+                <p>Isi form di bawah untuk mulai menggunakan layanan JOSS Laundry.</p>
+            </div>
+
+            <!-- progress -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- error alert -->
+            {% if form.errors %}
+            <div class="alert-error">
+                <span>⚠️</span>
+                <span>Terdapat kesalahan pada form. Mohon periksa kembali isian Anda.</span>
+            </div>
+            {% endif %}
+
+            <!-- form -->
+            <form method="post" id="registerForm" novalidate>
                 {% csrf_token %}
-                {% if form.errors %}<div class="bg-red-100 text-red-600 p-3 rounded text-sm mb-4">Periksa kembali isian Anda.</div>{% endif %}
-                {% for field in form %}
-                <div class="mb-3">
-                    <label class="block text-sm font-bold text-gray-700 mb-1">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}<p class="text-red-500 text-xs">{{ field.errors.0 }}</p>{% endif %}
+
+                <div class="form-grid">
+
+                    <!-- Full Name -->
+                    <div class="input-group col-full">
+                        <label for="id_full_name">Nama Lengkap <span class="req">*</span></label>
+                        <div class="input-wrap has-icon">
+                            <span class="field-icon">👤</span>
+                            <input type="text" name="full_name" id="id_full_name"
+                                placeholder="Nama lengkap sesuai identitas"
+                                value="{{ form.full_name.value|default:'' }}" required>
+                        </div>
+                        {% if form.full_name.errors %}
+                        <div class="field-error">⚠ {{ form.full_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Username -->
+                    <div class="input-group">
+                        <label for="id_username">Username <span class="req">*</span>
+                            <span class="label-hint">Tidak bisa diubah</span>
+                        </label>
+                        <div class="input-wrap has-icon">
+                            <span class="field-icon">@</span>
+                            <input type="text" name="username" id="id_username" placeholder="username_kamu"
+                                autocomplete="username" value="{{ form.username.value|default:'' }}" required>
+                        </div>
+                        {% if form.username.errors %}
+                        <div class="field-error">⚠ {{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+
+
+                    <!-- Phone -->
+                    <div class="input-group">
+                        <label for="id_phone_number">Nomor Telepon <span class="req">*</span></label>
+                        <div class="input-wrap has-icon">
+                            <span class="field-icon">📱</span>
+                            <input type="tel" name="phone_number" id="id_phone_number" placeholder="08123456789"
+                                value="{{ form.phone_number.value|default:'' }}" required>
+                        </div>
+                        {% if form.phone_number.errors %}
+                        <div class="field-error">⚠ {{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Address -->
+                    <div class="input-group col-full">
+                        <label for="id_address">Alamat <span class="req">*</span></label>
+                        <div class="input-wrap has-icon">
+                            <span class="field-icon" style="top:16px;align-self:flex-start;">📍</span>
+                            <textarea name="address" id="id_address" placeholder="Jl. Contoh No. 1, Kecamatan, Kota"
+                                required rows="2">{{ form.address.value|default:'' }}</textarea>
+                        </div>
+                        {% if form.address.errors %}
+                        <div class="field-error">⚠ {{ form.address.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password 1 -->
+                    <div class="input-group">
+                        <label for="id_password1">Password <span class="req">*</span></label>
+                        <div class="input-wrap has-icon">
+                            <span class="field-icon">🔒</span>
+                            <input type="password" name="password1" id="id_password1" placeholder="Min. 8 karakter"
+                                autocomplete="new-password" required>
+                            <button type="button" class="toggle-pwd"
+                                onclick="togglePwd('id_password1', this)">👁</button>
+                        </div>
+                        <div class="pwd-strength" id="pwdStrength" style="display:none">
+                            <div class="pwd-bars">
+                                <div class="pwd-bar" id="bar1"></div>
+                                <div class="pwd-bar" id="bar2"></div>
+                                <div class="pwd-bar" id="bar3"></div>
+                                <div class="pwd-bar" id="bar4"></div>
+                            </div>
+                            <div class="pwd-label" id="pwdLabel"></div>
+                        </div>
+                        {% if form.password1.errors %}
+                        <div class="field-error">⚠ {{ form.password1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password 2 -->
+                    <div class="input-group">
+                        <label for="id_password2">Konfirmasi Password <span class="req">*</span></label>
+                        <div class="input-wrap has-icon">
+                            <span class="field-icon">🔐</span>
+                            <input type="password" name="password2" id="id_password2" placeholder="Ulangi password"
+                                autocomplete="new-password" required>
+                            <button type="button" class="toggle-pwd"
+                                onclick="togglePwd('id_password2', this)">👁</button>
+                        </div>
+                        <div class="field-error" id="pwd2Error" style="display:none">⚠ Password tidak cocok</div>
+                        {% if form.password2.errors %}
+                        <div class="field-error">⚠ {{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Terms -->
+                    <div class="col-full terms-row">
+                        <input type="checkbox" class="custom-checkbox" id="terms" required>
+                        <label class="terms-label" for="terms">
+                            Saya menyetujui <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a>
+                            JOSS Laundry.
+                        </label>
+                    </div>
+
                 </div>
-                {% endfor %}
-                <div class="flex items-center gap-2 mt-4">
-                    <input type="checkbox" required class="rounded border-gray-300 text-brand-red">
-                    <label class="text-sm text-gray-600">Saya setuju <a href="#" class="text-brand-red">Syarat & Ketentuan</a></label>
-                </div>
-                <button type="submit" class="w-full bg-brand-red text-white font-bold py-3 rounded-lg hover:bg-red-700 mt-6">Daftar →</button>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span>Buat Akun Sekarang</span>
+                    <span class="btn-arrow">→</span>
+                </button>
             </form>
-            <p class="mt-6 text-center text-sm">Sudah punya akun? <a href="{% url 'accounts:login' %}" class="text-brand-red font-bold">Login</a></p>
+
+            <hr class="divider">
+
+
+
         </div>
     </div>
-</div>
-<script>
-    document.querySelectorAll('input, textarea').forEach(el => {
-        if(el.type !== 'checkbox' && el.type !== 'submit') el.classList.add('w-full', 'px-4', 'py-2', 'rounded-lg', 'border', 'border-gray-300', 'focus:ring-2', 'focus:ring-brand-red');
-    });
-</script>
-{% endblock %}
+
+    <script>
+        /* ── Toggle password visibility ── */
+        function togglePwd(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁';
+            }
+        }
+
+        /* ── Password strength ── */
+        const pwd1 = document.getElementById('id_password1');
+        const pwdStrength = document.getElementById('pwdStrength');
+        const bars = [document.getElementById('bar1'), document.getElementById('bar2'),
+        document.getElementById('bar3'), document.getElementById('bar4')];
+        const pwdLabel = document.getElementById('pwdLabel');
+
+        const levels = [
+            { label: 'Terlalu lemah', color: '#C8251F' },
+            { label: 'Lemah', color: '#f97316' },
+            { label: 'Cukup', color: '#eab308' },
+            { label: 'Kuat', color: '#16a34a' },
+        ];
+
+        pwd1.addEventListener('input', () => {
+            const val = pwd1.value;
+            if (!val) { pwdStrength.style.display = 'none'; return; }
+            pwdStrength.style.display = 'block';
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+            const lvl = Math.min(score - 1, 3);
+            bars.forEach((bar, i) => {
+                bar.style.background = i <= lvl ? levels[lvl].color : 'var(--white-border)';
+            });
+            pwdLabel.textContent = levels[lvl].label;
+            pwdLabel.style.color = levels[lvl].color;
+        });
+
+        /* ── Password match check ── */
+        const pwd2 = document.getElementById('id_password2');
+        const pwd2Error = document.getElementById('pwd2Error');
+        pwd2.addEventListener('input', () => {
+            if (pwd2.value && pwd1.value !== pwd2.value) {
+                pwd2Error.style.display = 'flex';
+            } else {
+                pwd2Error.style.display = 'none';
+            }
+        });
+
+        /* ── Progress fill based on filled fields ── */
+        const allInputs = document.querySelectorAll('#registerForm input:not([type=checkbox]), #registerForm textarea');
+        const progressFill = document.getElementById('progressFill');
+
+        function updateProgress() {
+            let filled = 0;
+            allInputs.forEach(inp => { if (inp.value.trim()) filled++; });
+            const pct = Math.round((filled / allInputs.length) * 100);
+            progressFill.style.width = pct + '%';
+            // update step dots on sidebar
+            if (pct < 33) {
+                setStep(1);
+            } else if (pct < 66) {
+                setStep(2);
+            } else {
+                setStep(3);
+            }
+        }
+
+        function setStep(n) {
+            for (let i = 1; i <= 3; i++) {
+                const el = document.getElementById('s' + i);
+                if (el) el.classList.toggle('active', i <= n);
+            }
+        }
+
+        allInputs.forEach(inp => inp.addEventListener('input', updateProgress));
+        updateProgress();
+
+        /* ── Ripple effect on submit button ── */
+        const btn = document.getElementById('submitBtn');
+        btn.addEventListener('click', function (e) {
+            const rect = this.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple-effect';
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px;position:absolute;`;
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 700);
+        });
+
+        /* ── Input valid indicator ── */
+        document.querySelectorAll('#registerForm input[required]').forEach(inp => {
+            inp.addEventListener('blur', () => {
+                if (inp.value.trim()) {
+                    inp.classList.add('is-valid');
+                } else {
+                    inp.classList.remove('is-valid');
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
