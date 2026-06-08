@@ -1,50 +1,348 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Joss Laundry - {% block title %}{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
-        .text-brand-red { color: #E52E2E; }
-        .bg-brand-red { background-color: #E52E2E; }
-        .bg-brand-red:hover { background-color: #C82222; }
-        .bg-dark-panel { background-color: #1A1311; }
+        :root {
+            --red: #C8251F;
+            --red-deep: #A01A15;
+            --red-glow: rgba(200, 37, 31, 0.14);
+            --red-soft: rgba(200, 37, 31, 0.07);
+            --bg: #FAF7F4;
+            --surface: #FFFFFF;
+            --surface-2: #F5F0EB;
+            --border: rgba(26, 26, 26, 0.08);
+            --ink: #1A1A1A;
+            --ink-dim: rgba(26, 26, 26, 0.6);
+            --muted: #777777;
+            --green: #16A34A;
+        }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: var(--ink);
+        }
+
+        /* ── NAVBAR STYLING ── */
+        .premium-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .brand-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.04em;
+            color: var(--red);
+            text-shadow: 0 2px 4px rgba(200, 37, 31, 0.05);
+            transition: all 0.2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-logo:hover {
+            color: var(--red-deep);
+            transform: scale(1.02);
+        }
+
+        .nav-link {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--ink-dim);
+            padding: 8px 16px;
+            border-radius: 100px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: var(--red);
+            background: var(--red-soft);
+        }
+
+        .user-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: var(--surface-2);
+            color: var(--ink);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 100px;
+            letter-spacing: 0.02em;
+            display: inline-block;
+        }
+
+        .btn-logout {
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: var(--red);
+            color: #ffffff !important;
+            padding: 8px 20px;
+            border-radius: 100px;
+            box-shadow: 0 4px 12px var(--red-glow);
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-logout:hover {
+            background: var(--red-deep);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px var(--red-glow);
+        }
+
+        /* ── FLASH MESSAGES STYLING ── */
+        .flash-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+            width: calc(100% - 48px);
+        }
+
+        .flash-message {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+            transition: all 0.3s;
+        }
+
+        .flash-message.success {
+            background: rgba(240, 253, 244, 0.95);
+            border-left: 4px solid var(--green);
+            color: #155724;
+        }
+
+        .flash-message.error {
+            background: rgba(254, 242, 242, 0.95);
+            border-left: 4px solid var(--red);
+            color: #721c24;
+        }
+
+        .flash-message.info {
+            background: rgba(239, 246, 255, 0.95);
+            border-left: 4px solid #3B82F6;
+            color: #1e40af;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+        }
+
+        /* ── FOOTER STYLING ── */
+        .premium-footer {
+            background: #1A1311;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px 24px;
+            color: #A3A3A3;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* ── RESPONSIVE MENU ── */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            outline: none;
+        }
+
+        .nav-links-mobile {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links-desktop {
+                display: none !important;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links-mobile {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                border-bottom: 1px solid var(--border);
+                padding: 16px 24px 24px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+                flex-direction: column;
+                gap: 16px;
+                z-index: 999;
+            }
+
+            .nav-links-mobile.active {
+                display: flex;
+            }
+        }
+
+        /* ── PREMIUM WHATSAPP MODAL STYLING ── */
+        .wa-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 20, 18, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .wa-modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .wa-modal-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(26, 26, 26, 0.08);
+            border-radius: 24px;
+            max-width: 480px;
+            width: calc(100% - 32px);
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .wa-modal-backdrop.active .wa-modal-card {
+            transform: scale(1);
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
+
+<body>
     {% if user.is_authenticated %}
-    <nav class="bg-white shadow-md sticky top-0 z-50">
+    <nav class="premium-nav sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <a href="{% url 'accounts:dashboard' %}" class="text-2xl font-bold text-brand-red">JOSS ★ LAUNDRY</a>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-600">{{ user.full_name }} ({{ user.get_role_display }})</span>
-                    <a href="{% url 'accounts:dashboard' %}" class="text-gray-700 hover:text-brand-red">Dashboard</a>
+                <a href="{% url 'accounts:dashboard' %}" class="brand-logo">JOSS ★ LAUNDRY</a>
+
+                <!-- Desktop Nav -->
+                <div class="nav-links-desktop flex items-center space-x-4">
+                    <span class="user-badge">{{ user.full_name }} ({{ user.get_role_display }})</span>
+                    <a href="{% url 'accounts:dashboard' %}" class="nav-link">Dashboard</a>
                     {% if user.is_owner %}
-                        <a href="{% url 'accounts:karyawan_list' %}" class="text-gray-700 hover:text-brand-red">Karyawan</a>
+                    <a href="{% url 'accounts:karyawan_list' %}" class="nav-link">Karyawan</a>
                     {% endif %}
-                    <a href="{% url 'accounts:logout' %}" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">Logout</a>
+                    <a href="{% url 'accounts:logout' %}" class="btn-logout">Logout</a>
                 </div>
+
+                <!-- Hamburger Button -->
+                <button id="menu-btn" class="menu-toggle">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Nav -->
+        <div id="mobile-menu" class="nav-links-mobile">
+            <div class="flex flex-col gap-3">
+                <span class="user-badge text-center">{{ user.full_name }} ({{ user.get_role_display }})</span>
+                <a href="{% url 'accounts:dashboard' %}" class="nav-link text-center">Dashboard</a>
+                {% if user.is_owner %}
+                <a href="{% url 'accounts:karyawan_list' %}" class="nav-link text-center">Karyawan</a>
+                {% endif %}
+                <a href="{% url 'accounts:logout' %}" class="btn-logout text-center mt-2">Logout</a>
             </div>
         </div>
     </nav>
     {% endif %}
 
     {% if messages %}
-    <div id="flash-messages" class="fixed top-20 right-5 z-50 space-y-2">
+    <div id="flash-container" class="flash-container">
         {% for message in messages %}
-        <div class="px-4 py-2 rounded-lg shadow-lg text-white 
-            {% if message.tags == 'error' %}bg-red-500{% elif message.tags == 'success' %}bg-green-500{% else %}bg-blue-500{% endif %}">
-            {{ message }}
+        <div
+            class="flash-message {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+            <div class="flex items-center gap-3 w-full">
+                {% if message.tags == 'error' %}
+                <svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {% elif message.tags == 'success' %}
+                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {% else %}
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {% endif %}
+                <span class="font-semibold text-sm">{{ message }}</span>
+            </div>
         </div>
         {% endfor %}
     </div>
     <script>
         setTimeout(() => {
-            const flash = document.getElementById('flash-messages');
-            if (flash) flash.style.display = 'none';
-        }, 3000);
+            const container = document.getElementById('flash-container');
+            if (container) {
+                Array.from(container.children).forEach(msg => {
+                    msg.style.animation = 'fadeOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                    setTimeout(() => msg.remove(), 400);
+                });
+            }
+        }, 3200);
     </script>
     {% endif %}
 
@@ -52,8 +350,113 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-dark-panel text-gray-400 text-center py-4 text-sm">
-        &copy; 2025 Joss Laundry - Solusi Laundry Modern
+    <footer class="premium-footer">
+        &copy; 2026 Joss Laundry - Solusi Laundry Modern Premium
     </footer>
+
+    <!-- ── CUSTOM WHATSAPP REDIRECT MODAL ── -->
+    <div id="wa-redirect-modal" class="wa-modal-backdrop" onclick="if(event.target===this) window.closeWaModal()">
+        <div class="wa-modal-card" onclick="event.stopPropagation()">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center text-green-500 shrink-0 relative">
+                    <span class="absolute inset-0 rounded-2xl bg-green-500/10 animate-ping"
+                        style="animation-duration: 2s;"></span>
+                    <svg class="w-7 h-7 relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.03-5.115-2.906-6.99C16.257 1.876 13.779 1.84 11.15 1.84c-5.441 0-9.866 4.417-9.87 9.864 0 1.701.446 3.364 1.294 4.842l-.994 3.63 3.738-.98h.001zm13.16-5.845c-.328-.164-1.942-.959-2.242-1.069-.301-.11-.52-.164-.739.164-.219.328-.848 1.069-1.04 1.288-.192.219-.384.247-.712.083-.328-.164-1.386-.51-2.64-1.629-.976-.87-1.636-1.946-1.828-2.274-.192-.328-.02-.505.143-.668.147-.146.328-.384.493-.576.164-.192.219-.328.328-.548.11-.219.055-.411-.027-.575-.082-.164-.739-1.782-1.013-2.44-.267-.642-.56-.554-.768-.565-.198-.01-.424-.012-.65-.012-.226 0-.594.085-.904.424-.31.339-1.186 1.162-1.186 2.834 0 1.671 1.219 3.284 1.389 3.513.17.229 2.399 3.662 5.811 5.132.812.35 1.446.559 1.94.716.815.259 1.558.223 2.146.135.656-.098 1.942-.794 2.216-1.562.274-.767.274-1.424.192-1.562-.082-.138-.301-.219-.63-.383z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 text-sm tracking-wide uppercase">Konfirmasi WhatsApp</h3>
+                    <p class="text-xs text-gray-400 font-semibold mt-0.5">Anda akan dialihkan ke WhatsApp resmi</p>
+                </div>
+            </div>
+
+            <div id="wa-preview-container"
+                class="bg-[#FAF7F4] border border-gray-100 rounded-2xl p-4 flex flex-col gap-2 shadow-inner">
+                <span class="text-[10px] font-extrabold tracking-wider text-amber-600 uppercase">PRATINJAU PESAN:</span>
+                <div id="wa-message-preview"
+                    class="text-xs text-gray-600 font-medium whitespace-pre-wrap leading-relaxed max-h-[120px] overflow-y-auto">
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 leading-relaxed font-medium">
+                Pesan di atas akan dikirimkan ke nomor WhatsApp customer. Klik <strong>Kirim Sekarang</strong> di bawah
+                untuk membuka aplikasi WhatsApp secara langsung.
+            </p>
+
+            <div class="flex gap-3 justify-end border-t border-gray-100 pt-4 mt-2">
+                <button id="wa-btn-cancel"
+                    class="px-5 py-2.5 text-xs font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition uppercase tracking-wider">Batal</button>
+                <a id="wa-btn-proceed" target="_blank"
+                    class="px-6 py-2.5 text-xs font-bold text-white bg-green-500 hover:bg-green-600 rounded-full shadow-md shadow-green-500/10 transition text-center uppercase tracking-wider">Kirim
+                    Sekarang</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WhatsApp Global Interceptor (Exposed immediately on window to prevent DOM race condition)
+        window.triggerWaRedirect = function (url) {
+            const modal = document.getElementById('wa-redirect-modal');
+            const proceedBtn = document.getElementById('wa-btn-proceed');
+            const previewContainer = document.getElementById('wa-preview-container');
+            const messagePreview = document.getElementById('wa-message-preview');
+            if (!modal || !proceedBtn) return;
+
+            proceedBtn.href = url;
+
+            let messageText = '';
+            try {
+                const urlObj = new URL(url);
+                messageText = urlObj.searchParams.get('text') || '';
+            } catch (e) {
+                if (url.includes('text=')) {
+                    messageText = url.split('text=')[1];
+                }
+            }
+
+            if (messageText) {
+                messagePreview.textContent = decodeURIComponent(messageText);
+                previewContainer.style.display = 'flex';
+            } else {
+                previewContainer.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+        };
+
+        window.closeWaModal = function () {
+            const modal = document.getElementById('wa-redirect-modal');
+            if (modal) modal.classList.remove('active');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (menuBtn && mobileMenu) {
+                menuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active');
+                });
+            }
+
+            const proceedBtn = document.getElementById('wa-btn-proceed');
+            const cancelBtn = document.getElementById('wa-btn-cancel');
+            if (proceedBtn) proceedBtn.addEventListener('click', window.closeWaModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', window.closeWaModal);
+
+            // Intercept all links going to wa.me
+            document.addEventListener('click', function (e) {
+                const link = e.target.closest('a');
+                if (link && link.href && link.href.includes('wa.me')) {
+                    e.preventDefault();
+                    window.triggerWaRedirect(link.href);
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>
