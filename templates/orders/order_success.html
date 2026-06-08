@@ -1,16 +1,500 @@
 {% extends 'base.html' %}
-{% block title %}Order Berhasil{% endblock %}
+{% block title %}Order Berhasil - Joss Laundry{% endblock %}
+
 {% block content %}
-<div class="max-w-md mx-auto px-4 py-16 text-center">
-    <div class="bg-white rounded-xl shadow p-8">
-        <div class="text-6xl mb-4">✅</div>
-        <h1 class="text-2xl font-bold mb-2">Pesanan Berhasil!</h1>
-        <p class="text-gray-600 mb-4">Kode Nota: <strong class="font-mono">{{ order.kode_nota }}</strong></p>
-        <p class="text-gray-600 mb-4">Total: <strong>Rp {{ order.total_harga|floatformat:0 }}</strong></p>
-        <a href="{{ wa_link }}" target="_blank" class="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 mb-4">Kirim WhatsApp ke Customer</a>
-        <div>
-            <a href="{% url 'orders:order_list_karyawan' %}" class="text-brand-red hover:underline">Kembali ke Daftar Order</a>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+<style>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    :root {
+        --red: #C8251F;
+        --red-deep: #A01A15;
+        --red-glow: rgba(200, 37, 31, 0.14);
+        --red-soft: rgba(200, 37, 31, 0.07);
+        --gold: #A87B00;
+        --gold-dim: rgba(168, 123, 0, 0.08);
+        --gold-border: rgba(168, 123, 0, 0.28);
+        --bg: #FAF7F4;
+        --surface: #FFFFFF;
+        --surface-2: #F5F0EB;
+        --border: rgba(26, 26, 26, 0.1);
+        --border-hover: rgba(26, 26, 26, 0.2);
+        --ink: #1A1A1A;
+        --ink-dim: rgba(26, 26, 26, 0.5);
+        --muted: #777777;
+        --green: #16a34a;
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .joss-page {
+        font-family: 'Barlow', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        padding: 32px 24px 64px;
+        position: relative;
+        overflow: hidden;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ── NOISE TEXTURE ── */
+    .joss-page::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.3;
+    }
+
+    /* ── AMBIENT GLOWS ── */
+    .glow-red {
+        position: fixed;
+        top: -180px;
+        left: -180px;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(200, 37, 31, 0.07) 0%, transparent 65%);
+        pointer-events: none;
+        z-index: 0;
+        animation: glowFloat 9s ease-in-out infinite;
+    }
+
+    .glow-gold {
+        position: fixed;
+        bottom: -200px;
+        right: -150px;
+        width: 650px;
+        height: 650px;
+        background: radial-gradient(circle, rgba(168, 123, 0, 0.06) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: glowFloat2 12s ease-in-out infinite;
+    }
+
+    @keyframes glowFloat {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(50px, 35px);
+        }
+    }
+
+    @keyframes glowFloat2 {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(-35px, -50px);
+        }
+    }
+
+    /* ── DOT GRID BACKGROUND ── */
+    .dot-grid {
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(26, 26, 26, 0.06) 1px, transparent 1px);
+        background-size: 28px 28px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* ── CONTENT CONTAINER ── */
+    .joss-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+        animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(28px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ── CARD ── */
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow:
+            0 12px 40px rgba(0, 0, 0, 0.08),
+            0 1px 4px rgba(0, 0, 0, 0.04);
+        position: relative;
+        text-align: center;
+    }
+
+    /* top accent bar */
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--red) 0%, #E8573C 50%, var(--gold) 100%);
+        z-index: 2;
+    }
+
+    /* ── CARD BODY ── */
+    .card-body {
+        padding: 32px 28px;
+    }
+
+    /* ── SUCCESS CHECKMARK SVG ANIMATION ── */
+    .success-checkmark-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    .checkmark-svg {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        display: block;
+        stroke-width: 4;
+        stroke: var(--green);
+        stroke-miterlimit: 10;
+        box-shadow: inset 0px 0px 0px var(--green);
+        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+    }
+
+    .checkmark-circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        stroke-width: 4;
+        stroke-miterlimit: 10;
+        stroke: var(--green);
+        fill: none;
+        animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    .checkmark-check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        stroke-width: 5;
+        stroke: var(--green);
+        animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+    }
+
+    @keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @keyframes scale {
+
+        0%,
+        100% {
+            transform: none;
+        }
+
+        50% {
+            transform: scale3d(1.15, 1.15, 1);
+        }
+    }
+
+    @keyframes fill {
+        100% {
+            box-shadow: inset 0px 0px 0px 42px rgba(22, 163, 74, 0.08);
+        }
+    }
+
+    .card-body h1 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(2.2rem, 5vw, 3rem);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: 0.03em;
+        margin: 0 0 10px;
+        color: var(--ink);
+    }
+
+    .card-body h1 span {
+        color: var(--green);
+    }
+
+    .card-body p {
+        font-size: 0.92rem;
+        color: var(--muted);
+        margin: 0 0 28px;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    /* ── ORDER DETAILS PANEL ── */
+    .success-details-card {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.015);
+        text-align: left;
+    }
+
+    .detail-badge-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .detail-lbl {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .nota-box {
+        font-family: monospace;
+        font-size: 0.94rem;
+        font-weight: 700;
+        color: var(--red);
+        background: rgba(200, 37, 31, 0.06);
+        border: 1px solid rgba(200, 37, 31, 0.15);
+        padding: 3px 10px;
+        border-radius: 6px;
+        letter-spacing: 0.02em;
+    }
+
+    .total-box {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--ink);
+    }
+
+    /* ── WHATSAPP BUTTON ── */
+    .btn-whatsapp {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 15px 24px;
+        background: #25D366;
+        /* WhatsApp Green */
+        border: none;
+        border-radius: 12px;
+        font-family: 'Barlow', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #ffffff;
+        cursor: pointer;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 18px rgba(37, 211, 102, 0.3);
+        margin-bottom: 16px;
+    }
+
+    .btn-whatsapp::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.25) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    .btn-whatsapp:hover {
+        background: #128C7E;
+        transform: translateY(-2.5px);
+        box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+    }
+
+    .btn-whatsapp:hover::after {
+        transform: translateX(100%);
+    }
+
+    .btn-whatsapp:active {
+        transform: translateY(0);
+    }
+
+    .wa-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* ── BACK LINK ── */
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .btn-back:hover {
+        color: var(--red);
+    }
+
+    /* ── STAGGER ITEMS ── */
+    .stagger-item {
+        opacity: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 520px) {
+        .joss-page {
+            padding: 36px 16px;
+        }
+
+        .card-body {
+            padding: 36px 24px;
+        }
+    }
+</style>
+
+<div class="joss-page">
+    <div class="dot-grid"></div>
+    <div class="glow-red"></div>
+    <div class="glow-gold"></div>
+
+    <div class="joss-container">
+
+        <!-- CARD -->
+        <div class="form-card">
+            <div class="card-body">
+
+                <!-- SUCCESS SVG CHECKMARK -->
+                <div class="success-checkmark-wrapper stagger-item">
+                    <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                        <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                    </svg>
+                </div>
+
+                <h1 class="stagger-item">Order <span>Berhasil!</span></h1>
+                <p class="stagger-item">Pesanan pelanggan telah berhasil didaftarkan ke sistem dan siap untuk diproses.
+                </p>
+
+                <!-- DETAILS CARD -->
+                <div class="success-details-card stagger-item">
+                    <div class="detail-badge-row">
+                        <span class="detail-lbl">Kode Nota</span>
+                        <span class="nota-box">{{ order.kode_nota }}</span>
+                    </div>
+                    <div class="detail-badge-row">
+                        <span class="detail-lbl">Total Tagihan</span>
+                        <span class="total-box">Rp {{ order.total_harga|floatformat:0 }}</span>
+                    </div>
+                </div>
+
+                <!-- WHATSAPP NOTIFICATION ACTION -->
+                <div class="stagger-item" style="width: 100%;">
+                    <a href="{{ wa_link }}" target="_blank" class="btn-whatsapp" id="btn-wa">
+                        <svg class="wa-icon" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.03-5.115-2.906-6.99C16.257 1.876 13.779 1.84 11.15 1.84c-5.441 0-9.866 4.417-9.87 9.864 0 1.701.446 3.364 1.294 4.842l-.994 3.63 3.738-.98h.001zm13.16-5.845c-.328-.164-1.942-.959-2.242-1.069-.301-.11-.52-.164-.739.164-.219.328-.848 1.069-1.04 1.288-.192.219-.384.247-.712.083-.328-.164-1.386-.51-2.64-1.629-.976-.87-1.636-1.946-1.828-2.274-.192-.328-.02-.505.143-.668.147-.146.328-.384.493-.576.164-.192.219-.328.328-.548.11-.219.055-.411-.027-.575-.082-.164-.739-1.782-1.013-2.44-.267-.642-.56-.554-.768-.565-.198-.01-.424-.012-.65-.012-.226 0-.594.085-.904.424-.31.339-1.186 1.162-1.186 2.834 0 1.671 1.219 3.284 1.389 3.513.17.229 2.399 3.662 5.811 5.132.812.35 1.446.559 1.94.716.815.259 1.558.223 2.146.135.656-.098 1.942-.794 2.216-1.562.274-.767.274-1.424.192-1.562-.082-.138-.301-.219-.63-.383z" />
+                        </svg>
+                        Kirim WhatsApp ke Customer
+                    </a>
+                </div>
+
+                <!-- BACK LINK -->
+                <div class="stagger-item">
+                    <a href="{% url 'orders:order_list_karyawan' %}" class="btn-back">
+                        ← Kembali ke Daftar Order
+                    </a>
+                </div>
+
+            </div>
         </div>
+
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        /* ── Staggered fade-up entry animation ── */
+        const items = document.querySelectorAll('.stagger-item');
+        items.forEach((el, i) => {
+            el.style.animation = 'fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards';
+            el.style.animationDelay = `${(i + 1) * 100}ms`;
+        });
+
+        /* ── Click ripple effect for WhatsApp button ── */
+        const waBtn = document.getElementById('btn-wa');
+        if (waBtn) {
+            waBtn.addEventListener('click', function (e) {
+                // Prevent default navigation to trigger informative popup first
+                e.preventDefault();
+
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.cssText = `
+                  position:absolute; border-radius:50%;
+                  width:${size}px; height:${size}px;
+                  left:${e.clientX - rect.left - size / 2}px;
+                  top:${e.clientY - rect.top - size / 2}px;
+                  background:rgba(255,255,255,0.25);
+                  transform:scale(0); animation:ripple 0.55s linear;
+                  pointer-events:none;
+                `;
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+
+                // Trigger custom premium WhatsApp modal from base.html
+                if (window.triggerWaRedirect) {
+                    window.triggerWaRedirect(this.getAttribute('href'));
+                } else {
+                    // Fallback to direct redirect if modal fails to load
+                    window.open(this.getAttribute('href'), '_blank');
+                }
+            });
+        }
+
+    });
+</script>
+
+<style>
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+</style>
 {% endblock %}

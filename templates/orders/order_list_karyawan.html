@@ -1,142 +1,405 @@
-{% extends 'base.html' %}
-{% block title %}Manajemen Order - JOSS Laundry{% endblock %}
-{% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Daftar Pesanan</h1>
-        <a href="{% url 'orders:order_create_walkin' %}" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">+ Order Walk-in</a>
-    </div>
-
-    <!-- Filter Form -->
-    <form method="get" class="bg-white p-4 rounded-lg shadow mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="text" name="search" placeholder="Cari kode nota / nama customer" value="{{ search_query }}" class="px-3 py-2 border rounded-lg focus:ring-brand-red">
-            <select name="progress" class="px-3 py-2 border rounded-lg">
-                <option value="">Semua Progress</option>
-                {% for value, label in progress_choices %}
-                    <option value="{{ value }}" {% if selected_progress == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <select name="payment" class="px-3 py-2 border rounded-lg">
-                <option value="">Semua Status Bayar</option>
-                {% for value, label in payment_choices %}
-                    <option value="{{ value }}" {% if selected_payment == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="bg-brand-red text-white px-4 py-2 rounded-lg hover:bg-red-700">Filter</button>
-        </div>
-    </form>
-
-    <!-- Orders Table -->
-    <div class="bg-white rounded-lg shadow overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode Nota</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No. HP</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paket</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Berat (kg)</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status Bayar</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Feedback</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nota PDF</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                {% for order in orders %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 font-mono text-sm">{{ order.kode_nota }}</td>
-                    <td class="px-6 py-4">{{ order.nama_customer }}</td>
-                    <td class="px-6 py-4">{{ order.nomor_hp }}</td>
-                    <td class="px-6 py-4">{{ order.paket.name }}</td>
-                    <td class="px-6 py-4">{{ order.berat }}</td>
-                    <td class="px-6 py-4">Rp {{ order.total_harga|floatformat:0 }}</td>
-
-                    <!-- Progress dropdown update -->
-                    <td class="px-6 py-4">
-                        <form method="post" action="{% url 'orders:update_progress' order.id %}" class="flex gap-1">
-                            {% csrf_token %}
-                            <select name="progress_status" class="text-sm border rounded px-2 py-1">
-                                {% for value, label in progress_choices %}
-                                    <option value="{{ value }}" {% if order.progress_status == value %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600">Update</button>
-                        </form>
-                    </td>
-
-                    <!-- Status Bayar -->
-                    <td class="px-6 py-4">
-                        {% if order.payment_status == 'PAID' %}
-                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Lunas</span>
-                        {% else %}
-                            <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Belum Bayar</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Feedback & status balasan -->
-                    <td class="px-6 py-4">
-                        {% if order.feedback %}
-                            {% if order.feedback.reply %}
-                                <span class="text-green-600 text-sm">✅ Sudah dibalas</span><br>
-                            {% else %}
-                                <span class="text-orange-500 text-sm">⏳ Belum dibalas</span><br>
-                            {% endif %}
-                            <a href="{% url 'orders:reply_feedback' order.feedback.id %}" class="text-blue-600 text-sm hover:underline">Lihat & Balas</a>
-                        {% else %}
-                            <span class="text-gray-400">-</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Nota PDF (hanya jika lunas) -->
-                    <td class="px-6 py-4">
-                        {% if order.payment_status == 'PAID' %}
-                            {% if order.nota_pdf %}
-                                <a href="{% url 'orders:karyawan_download_nota' order.id %}" class="text-brand-red hover:underline">📄 Download</a>
-                            {% else %}
-                                <a href="{% url 'orders:regenerate_nota' order.id %}" class="text-orange-500 hover:underline">⚠️ Generate Ulang</a>
-                            {% endif %}
-                        {% else %}
-                            <span class="text-gray-400">-</span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Tombol Konfirmasi Bayar khusus untuk status SELESAI & UNPAID -->
-                    <td class="px-6 py-4">
-                        {% if order.progress_status == 'SELESAI' and order.payment_status == 'UNPAID' %}
-                            <a href="{% url 'orders:confirm_payment' order.id %}" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Konfirmasi Bayar</a>
-                        {% else %}
-                            <span class="text-gray-400">-</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="11" class="text-center py-8 text-gray-500">Belum ada pesanan.{% for _ in '' %}   {% endfor %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Auto-open WhatsApp jika wa_link ada di URL -->
-<script>
-    // Cek parameter wa_link di URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const waLink = urlParams.get('wa_link');
-    if (waLink) {
-        // Hapus parameter wa_link dari URL agar tidak terus muncul saat refresh
-        const cleanUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-        
-        // Konfirmasi untuk membuka WhatsApp
-        if (confirm("Status telah diubah menjadi SELESAI. Kirim notifikasi WhatsApp ke customer sekarang?")) {
-            window.open(waLink, '_blank');
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOSS LAUNDRY — Daftar Pesanan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Theme Styles */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --red: #C8251F; --red-deep: #A01A15; --red-glow: rgba(200, 37, 31, 0.12); --red-soft: rgba(200, 37, 31, 0.08);
+            --dark: #FAF7F4; --dark-2: #FFFFFF; --dark-3: #F5F0EB;
+            --white: #1A1A1A; --white-dim: rgba(26, 26, 26, 0.5); --white-border: rgba(26, 26, 26, 0.1);
+            --gold: #A87B00; --green: #16a34a; --blue: #3b82f6; --muted: #777777;
         }
-    }
-</script>
-{% endblock %}
+        body { font-family: 'Barlow', sans-serif; background: var(--dark); color: var(--white); min-height: 100vh; }
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 9999; opacity: 0.25;
+        }
+        .bg-glow { position: fixed; top: -200px; left: -200px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(200, 37, 31, 0.06) 0%, transparent 65%); pointer-events: none; z-index: 0; animation: bgFloat 8s ease-in-out infinite; }
+        @keyframes bgFloat { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(60px, 40px); } }
+        
+        /* Nav */
+        nav {
+            position: sticky; top: 0; z-index: 100; background: rgba(250, 247, 244, 0.92); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--white-border); padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; text-decoration: none; color: var(--white); }
+        .logo span.red { color: var(--red); }
+        .logo .star { color: var(--gold); font-size: 0.9rem; animation: spin 6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .btn-back { background: var(--white-border); color: var(--white); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; padding: 8px 16px; border-radius: 8px; text-decoration: none; transition: background 0.2s; }
+        .btn-back:hover { background: rgba(26,26,26,0.15); }
+        
+        main { position: relative; z-index: 1; max-width: 1400px; margin: 40px auto; padding: 0 24px; animation: fadeUp 0.6s ease-out; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Header */
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.04em; }
+        h1 .accent { color: var(--red); }
+        .btn-primary { background: var(--red); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; transition: background 0.2s, transform 0.2s; font-size: 0.85rem; }
+        .btn-primary:hover { background: var(--red-deep); transform: translateY(-1px); box-shadow: 0 4px 12px var(--red-glow); }
+
+        /* Filter Form */
+        .filter-card { background: var(--dark-2); border: 1px solid var(--white-border); border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); }
+        .filter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .filter-input, .filter-select { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--white-border); background: var(--dark-3); font-family: 'Barlow', sans-serif; font-size: 0.9rem; color: var(--white); transition: border-color 0.2s, background 0.2s; }
+        .filter-input:focus, .filter-select:focus { outline: none; border-color: var(--red); background: white; }
+        .btn-filter { background: var(--dark-3); border: 1px solid var(--white-border); color: var(--white); font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; font-size: 0.85rem; }
+        .btn-filter:hover { background: var(--red); color: white; border-color: var(--red); }
+
+        /* Table */
+        .table-container { background: var(--dark-2); border: 1px solid var(--white-border); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: var(--dark-3); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: var(--muted); padding: 16px 20px; border-bottom: 1px solid var(--white-border); white-space: nowrap; }
+        td { padding: 16px 20px; border-bottom: 1px solid var(--white-border); font-size: 0.9rem; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(250, 247, 244, 0.5); }
+        
+        .mono { font-family: monospace; letter-spacing: 1px; color: var(--red); font-weight: 700; background: var(--red-soft); padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; white-space: nowrap; }
+        
+        /* Pills */
+        .pill { display: inline-block; padding: 4px 10px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+        .pill-green { background: rgba(22, 163, 74, 0.1); color: var(--green); border: 1px solid rgba(22, 163, 74, 0.2); }
+        .pill-red { background: rgba(200, 37, 31, 0.1); color: var(--red); border: 1px solid rgba(200, 37, 31, 0.2); }
+
+        /* Form inside table */
+        .progress-form { display: flex; gap: 8px; align-items: center; }
+        .progress-form select { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--white-border); font-family: 'Barlow', sans-serif; font-size: 0.8rem; background: var(--dark-3); }
+        .btn-update { background: var(--blue); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: background 0.2s; }
+        .btn-update:hover { background: #2563eb; }
+
+        .btn-confirm { background: var(--green); color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 600; display: inline-block; transition: background 0.2s; white-space: nowrap; }
+        .btn-confirm:hover { background: #15803d; }
+        
+        .action-link { font-size: 0.8rem; font-weight: 600; text-decoration: none; color: var(--blue); }
+        .action-link:hover { text-decoration: underline; }
+        .action-link.red { color: var(--red); }
+        .action-link.orange { color: #ea580c; }
+        
+        .feedback-status { font-size: 0.8rem; font-weight: 500; margin-bottom: 4px; display: block; }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.2s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 700;
+        }
+        .modal-body {
+            padding: 16px 20px;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: #6b7280;
+        }
+        .close-modal:hover {
+            color: #111;
+        }
+        .timeline-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .timeline-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        .timeline-list li strong {
+            color: #C8251F;
+        }
+        .btn-history {
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1f2937;
+            transition: all 0.2s;
+        }
+        .btn-history:hover {
+            background: #C8251F;
+            color: white;
+            border-color: #C8251F;
+        }
+        @media (max-width: 1024px) { .filter-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { .filter-grid { grid-template-columns: 1fr; } nav { padding: 0 16px; } main { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+
+    <nav>
+        <a class="logo" href="{% url 'accounts:karyawan_dashboard' %}">
+            <span class="red">JOSS</span>
+            <span class="star">★</span>
+            <span>LAUNDRY</span>
+        </a>
+        <div class="nav-right">
+            <a href="{% url 'accounts:karyawan_dashboard' %}" class="btn-back">← Dashboard</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <h1>Daftar <span class="accent">Pesanan</span></h1>
+            <a href="{% url 'orders:order_create_walkin' %}" class="btn-primary">+ Order Walk-in</a>
+        </div>
+
+        <form method="get" class="filter-card">
+            <div class="filter-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                <!-- Cari kode nota / nama -->
+                <input type="text" name="search" placeholder="Cari kode nota / nama..." value="{{ search_query }}" class="filter-input">
+                
+                <!-- Filter tanggal mulai -->
+                <input type="date" name="start_date" value="{{ start_date|default:'' }}" placeholder="Dari tanggal" class="filter-input">
+                
+                <!-- Filter tanggal selesai -->
+                <input type="date" name="end_date" value="{{ end_date|default:'' }}" placeholder="Sampai tanggal" class="filter-input">
+                
+                <!-- Pilihan Progress -->
+                <select name="progress" class="filter-select">
+                    <option value="">Semua Progress</option>
+                    {% for value, label in progress_choices %}
+                        <option value="{{ value }}" {% if selected_progress == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Pilihan Status Bayar -->
+                <select name="payment" class="filter-select">
+                    <option value="">Semua Status Bayar</option>
+                    {% for value, label in payment_choices %}
+                        <option value="{{ value }}" {% if selected_payment == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Tombol Filter -->
+                <button type="submit" class="btn-filter">Filter Data</button>
+                
+                <!-- Tombol Reset (hanya muncul jika ada filter aktif) -->
+                {% if selected_progress or selected_payment or search_query or start_date or end_date %}
+                <a href="{% url 'orders:order_list_karyawan' %}" class="btn-reset" style="display: inline-flex; align-items: center; justify-content: center;">Reset Filter</a>
+                {% endif %}
+            </div>
+        </form>
+
+        <div class="table-container">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kode Nota</th>
+                            <th>Customer</th>
+                            <th>Paket & Berat</th>
+                            <th>Total (Rp)</th>
+                            <th>Progress</th>
+                            <th>Pembayaran</th>
+                            <th>Feedback</th>
+                            <th>Timeline</th>
+                            <th>Nota PDF</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><span class="mono">{{ order.kode_nota }}</span></td>
+                            <td>
+                                <strong>{{ order.nama_customer }}</strong><br>
+                                <span style="font-size:0.75rem; color:var(--muted)">{{ order.nomor_hp }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ order.paket.name }}</strong><br>
+                                <span style="font-size:0.75rem; color:var(--muted)">{{ order.berat }} kg</span>
+                            </td>
+                            <td><strong>{{ order.total_harga|floatformat:0 }}</strong></td>
+                            
+                            <td>
+                                <form method="post" action="{% url 'orders:update_progress' order.id %}" class="progress-form">
+                                    {% csrf_token %}
+                                    <select name="progress_status">
+                                        {% for value, label in progress_choices %}
+                                            <option value="{{ value }}" {% if order.progress_status == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn-update">✓</button>
+                                </form>
+                            </td>
+                            
+                            <td>
+                                {% if order.payment_status == 'PAID' %}
+                                    <span class="pill pill-green">Lunas</span>
+                                {% else %}
+                                    <span class="pill pill-red">Belum Bayar</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {% if order.feedback %}
+                                    {% if order.feedback.reply %}
+                                        <span class="feedback-status" style="color:var(--green)">✅ Dibalas</span>
+                                    {% else %}
+                                        <span class="feedback-status" style="color:#ea580c">⏳ Menunggu</span>
+                                    {% endif %}
+                                    <a href="{% url 'orders:reply_feedback' order.feedback.id %}" class="action-link">Lihat/Balas</a>
+                                {% else %}
+                                    <span style="color:var(--muted); font-size:0.85rem;">-</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td style="text-align: center;">
+                                <button type="button" class="btn-history" 
+                                        data-order-id="{{ order.id }}" 
+                                        data-order-code="{{ order.kode_nota }}"
+                                        data-history='[
+                                            {% for log in order.progress_logs.all %}
+                                                {"status": "{{ log.get_status_display }}", "time": "{{ log.changed_at|date:'d/m/Y H:i' }}"}{% if not forloop.last %},{% endif %}
+                                            {% endfor %}
+                                        ]'>
+                                    📋 History
+                                </button>
+                            </td>
+
+                            <td>
+                                {% if order.payment_status == 'PAID' %}
+                                    {% if order.nota_pdf %}
+                                        <a href="{% url 'orders:karyawan_download_nota' order.id %}" class="action-link red">📄 Download</a>
+                                    {% else %}
+                                        <a href="{% url 'orders:regenerate_nota' order.id %}" class="action-link orange">⚠️ Generate Ulang</a>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color:var(--muted); font-size:0.85rem;">-</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {% if order.progress_status == 'SELESAI' and order.payment_status == 'UNPAID' %}
+                                    <a href="{% url 'orders:confirm_payment' order.id %}" class="btn-confirm">Konfirmasi Bayar</a>
+                                {% else %}
+                                    <span style="color:var(--muted); font-size:0.85rem;">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 48px; color: var(--muted);">Belum ada pesanan yang sesuai.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Riwayat Status -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modalOrderCode">Riwayat Pesanan</span>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <ul class="timeline-list" id="timelineList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-open WhatsApp jika wa_link ada di URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const waLink = urlParams.get('wa_link');
+        if (waLink) {
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+            if (confirm("Status telah diubah menjadi SELESAI. Kirim notifikasi WhatsApp ke customer sekarang?")) {
+                window.open(waLink, '_blank');
+            }
+        }
+
+        // Modal timeline
+        const modal = document.getElementById('historyModal');
+        const modalOrderCode = document.getElementById('modalOrderCode');
+        const timelineList = document.getElementById('timelineList');
+        const closeModal = document.querySelector('.close-modal');
+
+        function showHistory(button) {
+            const orderCode = button.getAttribute('data-order-code');
+            const historyJson = button.getAttribute('data-history');
+            let logs = [];
+            try {
+                logs = JSON.parse(historyJson);
+            } catch(e) {
+                logs = [];
+            }
+            modalOrderCode.textContent = `Riwayat - ${orderCode}`;
+            timelineList.innerHTML = '';
+            if (logs.length === 0) {
+                timelineList.innerHTML = '<li style="justify-content: center;">Belum ada perubahan status</li>';
+            } else {
+                logs.forEach(log => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${log.status}</strong> <span>${log.time}</span>`;
+                    timelineList.appendChild(li);
+                });
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeModalFunc() {
+            modal.style.display = 'none';
+        }
+        closeModal.addEventListener('click', closeModalFunc);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModalFunc();
+        });
+
+        document.querySelectorAll('.btn-history').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showHistory(btn);
+            });
+        });
+    </script>
+</body>
+</html>

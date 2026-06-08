@@ -1,26 +1,655 @@
 {% extends 'base.html' %}
-{% block title %}Klaim Pesanan - JOSS Laundry{% endblock %}
+{% block title %}Klaim Pesanan - Joss Laundry{% endblock %}
+
 {% block content %}
-<div class="max-w-md mx-auto px-4 py-16">
-    <div class="bg-white rounded-xl shadow p-8">
-        <h1 class="text-2xl font-bold text-center mb-6">Klaim Pesanan</h1>
-        <p class="text-gray-600 text-center mb-6">Masukkan kode nota dan nomor HP yang Anda terima via WhatsApp</p>
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="mb-4">
-                <label class="block text-sm font-bold text-gray-700 mb-1">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}<p class="text-red-500 text-xs mt-1">{{ field.errors.0 }}</p>{% endif %}
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+<style>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    :root {
+        --red: #C8251F;
+        --red-deep: #A01A15;
+        --red-glow: rgba(200, 37, 31, 0.14);
+        --red-soft: rgba(200, 37, 31, 0.07);
+        --gold: #A87B00;
+        --gold-dim: rgba(168, 123, 0, 0.08);
+        --gold-border: rgba(168, 123, 0, 0.28);
+        --bg: #FAF7F4;
+        --surface: #FFFFFF;
+        --surface-2: #F5F0EB;
+        --border: rgba(26, 26, 26, 0.1);
+        --border-hover: rgba(26, 26, 26, 0.2);
+        --ink: #1A1A1A;
+        --ink-dim: rgba(26, 26, 26, 0.5);
+        --muted: #777777;
+        --green: #16a34a;
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .joss-page {
+        font-family: 'Barlow', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        padding: 72px 24px 100px;
+        position: relative;
+        overflow: hidden;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ── NOISE TEXTURE ── */
+    .joss-page::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.3;
+    }
+
+    /* ── AMBIENT GLOWS ── */
+    .glow-red {
+        position: fixed;
+        top: -180px;
+        left: -180px;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(200, 37, 31, 0.07) 0%, transparent 65%);
+        pointer-events: none;
+        z-index: 0;
+        animation: glowFloat 9s ease-in-out infinite;
+    }
+
+    .glow-gold {
+        position: fixed;
+        bottom: -200px;
+        right: -150px;
+        width: 650px;
+        height: 650px;
+        background: radial-gradient(circle, rgba(168, 123, 0, 0.06) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+        animation: glowFloat2 12s ease-in-out infinite;
+    }
+
+    @keyframes glowFloat {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(50px, 35px);
+        }
+    }
+
+    @keyframes glowFloat2 {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(-35px, -50px);
+        }
+    }
+
+    /* ── DOT GRID BACKGROUND ── */
+    .dot-grid {
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(26, 26, 26, 0.06) 1px, transparent 1px);
+        background-size: 28px 28px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* ── CONTENT CONTAINER ── */
+    .joss-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 520px;
+        margin: 0 auto;
+        animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(28px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ── BACK LINK ── */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 500;
+        text-decoration: none;
+        margin-bottom: 24px;
+        padding: 7px 14px 7px 10px;
+        border-radius: 100px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        transition: all 0.2s;
+        letter-spacing: 0.02em;
+    }
+
+    .back-link:hover {
+        color: var(--ink);
+        border-color: var(--border-hover);
+        transform: translateX(-3px);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .back-link .arrow {
+        font-size: 1rem;
+    }
+
+    /* ── CARD ── */
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow:
+            0 12px 40px rgba(0, 0, 0, 0.08),
+            0 1px 4px rgba(0, 0, 0, 0.04);
+        position: relative;
+    }
+
+    /* top accent bar */
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--red) 0%, #E8573C 50%, var(--gold) 100%);
+        z-index: 2;
+    }
+
+    /* ── CARD HEADER ── */
+    .card-header {
+        padding: 38px 40px 28px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    /* decorative corner circle */
+    .card-header::after {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, var(--red-soft) 0%, transparent 65%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .header-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(200, 37, 31, 0.06);
+        border: 1px solid rgba(200, 37, 31, 0.15);
+        border-radius: 100px;
+        padding: 4px 12px 4px 8px;
+        margin-bottom: 14px;
+    }
+
+    .eyebrow-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--red);
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.35;
+            transform: scale(0.6);
+        }
+    }
+
+    .header-eyebrow span {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--red);
+    }
+
+    .card-header h1 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(2rem, 4.5vw, 2.8rem);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: 0.03em;
+        margin: 0 0 6px;
+        color: var(--ink);
+    }
+
+    .card-header h1 .accent {
+        color: var(--red);
+    }
+
+    .card-header p {
+        font-size: 0.88rem;
+        color: var(--muted);
+        margin: 0;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    /* ── CARD BODY ── */
+    .card-body {
+        padding: 36px 40px 40px;
+    }
+
+    /* ── FIELD GROUP ── */
+    .field-group {
+        margin-bottom: 24px;
+        opacity: 0;
+    }
+
+    .field-label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-dim);
+        margin-bottom: 8px;
+        transition: color 0.2s;
+    }
+
+    .field-group:focus-within .field-label {
+        color: var(--red);
+    }
+
+    .field-required {
+        color: var(--red);
+        font-size: 0.85rem;
+        line-height: 1;
+    }
+
+    /* ── INPUT WRAPPER ── */
+    .input-wrap {
+        position: relative;
+    }
+
+    .input-wrap::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 18%;
+        bottom: 18%;
+        width: 3px;
+        background: var(--red);
+        border-radius: 0 3px 3px 0;
+        opacity: 0;
+        transform: scaleY(0);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 2;
+    }
+
+    .input-wrap:focus-within::before {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+
+    /* ── INPUT STYLES ── */
+    .joss-page input {
+        width: 100%;
+        padding: 13px 18px;
+        background: var(--surface-2);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-family: 'Barlow', sans-serif;
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: var(--ink);
+        outline: none;
+        transition: all 0.25s ease;
+    }
+
+    .joss-page input:hover {
+        border-color: var(--border-hover);
+        background: #F0EBE5;
+    }
+
+    .joss-page input:focus {
+        border-color: var(--red);
+        background: var(--surface);
+        box-shadow: 0 0 0 4px var(--red-glow);
+    }
+
+    /* ── ERROR & HELP ── */
+    .field-error {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--red);
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-top: 7px;
+        padding: 6px 12px;
+        background: rgba(200, 37, 31, 0.05);
+        border-radius: 8px;
+        border-left: 3px solid var(--red);
+    }
+
+    .field-error svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    .field-help {
+        font-size: 0.76rem;
+        color: var(--muted);
+        margin-top: 6px;
+        padding-left: 4px;
+        line-height: 1.5;
+    }
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px 24px;
+        background: var(--red);
+        border: none;
+        border-radius: 12px;
+        font-family: 'Barlow', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #ffffff;
+        cursor: pointer;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 18px var(--red-glow);
+        margin-top: 12px;
+    }
+
+    .btn-submit::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+
+    .btn-submit:hover {
+        background: var(--red-deep);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px var(--red-glow);
+    }
+
+    .btn-submit:hover::after {
+        transform: translateX(100%);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-submit svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 520px) {
+        .joss-page {
+            padding: 36px 16px;
+        }
+
+        .card-header,
+        .card-body {
+            padding: 30px 24px;
+        }
+    }
+</style>
+
+<div class="joss-page">
+    <div class="dot-grid"></div>
+    <div class="glow-red"></div>
+    <div class="glow-gold"></div>
+
+    <div class="joss-container">
+
+        <!-- BACK LINK -->
+        <a href="{% url 'orders:customer_dashboard' %}" class="back-link">
+            <span class="arrow">←</span> Kembali ke Dashboard
+        </a>
+
+        <!-- FORM CARD -->
+        <div class="form-card">
+
+            <!-- HEADER -->
+            <div class="card-header">
+                <div class="header-eyebrow">
+                    <div class="eyebrow-dot"></div>
+                    <span>Sinkronisasi Nota</span>
+                </div>
+                <h1>Klaim <span class="accent">Pesanan Anda</span></h1>
+                <p>Masukkan kode nota dan nomor HP terdaftar untuk menyinkronkan data laundry ke akun Anda.</p>
             </div>
-            {% endfor %}
-            <button type="submit" class="w-full bg-brand-red text-white font-bold py-3 rounded-lg hover:bg-red-700 transition">Klaim Sekarang</button>
-        </form>
+
+            <!-- BODY -->
+            <div class="card-body">
+                <form method="post" novalidate id="claim-form">
+                    {% csrf_token %}
+
+                    {% for field in form %}
+                    <div class="field-group">
+
+                        <div class="field-label">
+                            {{ field.label }}
+                            {% if field.field.required %}<span class="field-required">*</span>{% endif %}
+                        </div>
+
+                        <div class="input-wrap">
+                            {{ field }}
+                        </div>
+
+                        {% if field.errors %}
+                        <div class="field-error">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {{ field.errors.0 }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+                    {% endfor %}
+
+                    <button type="submit" class="btn-submit" id="btn-submit">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        Klaim Sekarang
+                    </button>
+                </form>
+            </div>
+
+        </div>
     </div>
 </div>
+
 <script>
-    document.querySelectorAll('input').forEach(el => {
-        el.classList.add('w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-lg', 'focus:ring-2', 'focus:ring-brand-red');
+    document.addEventListener('DOMContentLoaded', () => {
+        const claimForm = document.getElementById('claim-form');
+        const submitBtn = document.getElementById('btn-submit');
+        const inputNota = document.querySelector('input[name="kode_nota"]');
+        const inputHp = document.querySelector('input[name="nomor_hp"]');
+
+        /* ── Staggered fade-up untuk setiap field ── */
+        const groups = document.querySelectorAll('.field-group, .btn-submit');
+        groups.forEach((el, i) => {
+            el.style.animation = 'fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards';
+            el.style.animationDelay = `${(i + 1) * 100}ms`;
+        });
+
+        /* ── INTERAKTIF: Validasi Real-time Kode Nota ── */
+        if (inputNota) {
+            // Buat container teks bantuan dinamis
+            const helper = document.createElement('div');
+            helper.className = 'field-help';
+            helper.style.marginTop = '6px';
+            helper.style.fontSize = '0.78rem';
+            helper.innerHTML = 'Format: <strong>JOSS-YYYYMMDD-XXXX</strong> (Contoh: JOSS-20260530-0001)';
+            inputNota.parentNode.appendChild(helper);
+
+            inputNota.addEventListener('input', function () {
+                // Auto-Kapitalisasi dan hilangkan spasi
+                this.value = this.value.toUpperCase().replace(/\s+/g, '');
+
+                // Regex validasi format JOSS-YYYYMMDD-XXXX
+                const regex = /^JOSS-\d{8}-\d{4}$/;
+                if (regex.test(this.value)) {
+                    this.style.borderColor = 'var(--green)';
+                    this.style.boxShadow = '0 0 0 4px rgba(22, 163, 74, 0.15)';
+                    helper.innerHTML = '<span style="color: var(--green); font-weight: 700;">✓ Format Nota Valid dan Sempurna!</span>';
+                } else if (this.value.length > 5 && !this.value.startsWith('JOSS-')) {
+                    this.style.borderColor = 'var(--red)';
+                    this.style.boxShadow = '0 0 0 4px var(--red-glow)';
+                    helper.innerHTML = '<span style="color: var(--red); font-weight: 600;">⚠️ Harus diawali dengan kata "JOSS-"</span>';
+                } else {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                    helper.innerHTML = 'Format: <strong>JOSS-YYYYMMDD-XXXX</strong> (Contoh: JOSS-20260530-0001)';
+                }
+            });
+        }
+
+        /* ── INTERAKTIF: Validasi Real-time Nomor HP ── */
+        if (inputHp) {
+            const helper = document.createElement('div');
+            helper.className = 'field-help';
+            helper.style.marginTop = '6px';
+            helper.style.fontSize = '0.78rem';
+            helper.innerHTML = 'Gunakan nomor HP terdaftar (Contoh: 081234567890)';
+            inputHp.parentNode.appendChild(helper);
+
+            inputHp.addEventListener('input', function () {
+                // Bersihkan spasi atau karakter non-angka/non-+
+                this.value = this.value.replace(/[^0-9+]/g, '');
+
+                // Regex nomor telepon Indonesia murni
+                const regex = /^(?:\+62|0)8[1-9][0-9]{8,11}$/;
+                if (regex.test(this.value)) {
+                    this.style.borderColor = 'var(--green)';
+                    this.style.boxShadow = '0 0 0 4px rgba(22, 163, 74, 0.15)';
+                    helper.innerHTML = '<span style="color: var(--green); font-weight: 700;">✓ Format Nomor HP Valid!</span>';
+                } else if (this.value.length > 3 && !this.value.startsWith('0') && !this.value.startsWith('+62')) {
+                    this.style.borderColor = 'var(--red)';
+                    this.style.boxShadow = '0 0 0 4px var(--red-glow)';
+                    helper.innerHTML = '<span style="color: var(--red); font-weight: 600;">⚠️ Harus diawali "0" atau "+62"</span>';
+                } else {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                    helper.innerHTML = 'Gunakan nomor HP terdaftar (Contoh: 081234567890)';
+                }
+            });
+        }
+
+        /* ── Ripple effect pada tombol submit ── */
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function (e) {
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.cssText = `
+          position:absolute; border-radius:50%;
+          width:${size}px; height:${size}px;
+          left:${e.clientX - rect.left - size / 2}px;
+          top:${e.clientY - rect.top - size / 2}px;
+          background:rgba(255,255,255,0.25);
+          transform:scale(0); animation:ripple 0.55s linear;
+          pointer-events:none;
+        `;
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        }
+
+        /* ── Submit loading state ── */
+        if (claimForm && submitBtn) {
+            claimForm.addEventListener('submit', () => {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+          <svg style="animation:spin 0.8s linear infinite;width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/>
+          </svg>
+          Memproses Klaim...
+        `;
+            });
+        }
+
     });
 </script>
-{% endblock %}
+
+<style>
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+{% endblock %}  
