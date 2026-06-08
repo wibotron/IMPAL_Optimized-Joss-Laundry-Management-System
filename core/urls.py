@@ -21,10 +21,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
-from .views import landing_page
+from .views import landing_page, about_page, contact_page, faq_page, terms_page, privacy_page
 
 urlpatterns = [
     path('', landing_page, name='landing'),
+    path('about/', TemplateView.as_view(template_name='about/about.html'), name='about'),
+    path('contact/', TemplateView.as_view(template_name='contact/contact.html'), name='contact'),
+    path('faq/', TemplateView.as_view(template_name='faq/faq.html'), name='faq'),
+    path('terms/', TemplateView.as_view(template_name='terms/terms.html'), name='terms'),
+    path('privacy/', TemplateView.as_view(template_name='privacy/privacy.html'), name='privacy'),
     path('admin/', admin.site.urls),
     path('accounts/', include('apps.accounts.urls')), 
     path('packages/', include('apps.laundry_package.urls')),
