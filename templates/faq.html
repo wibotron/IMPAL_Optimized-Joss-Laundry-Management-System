@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}FAQ - JOSS Laundry{% endblock %}
+{% block content %}
+<div class="py-16 px-4 max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+        <span class="text-xs font-bold tracking-widest text-[var(--red)] uppercase bg-[var(--red-soft)] px-3 py-1 rounded-full">Bantuan</span>
+        <h1 class="text-5xl font-black mt-4 mb-6 tracking-tight text-[var(--ink)]">PERTANYAAN UMUM (FAQ)</h1>
+        <p class="text-lg text-[var(--ink-dim)] leading-relaxed max-w-2xl mx-auto font-medium">
+            Temukan jawaban cepat atas pertanyaan-pertanyaan yang sering diajukan mengenai layanan, tarif, dan jaminan kualitas di JOSS Laundry.
+        </p>
+    </div>
+
+    <!-- Details Accordion Section -->
+    <div class="space-y-6">
+        <details class="group bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 [&_summary::-webkit-details-marker]:hidden transition shadow-sm hover:shadow-md cursor-pointer" open>
+            <summary class="flex items-center justify-between gap-4">
+                <h2 class="text-lg font-bold text-[var(--ink)] tracking-wide">
+                    Apakah cucian saya dicampur dengan pelanggan lain?
+                </h2>
+                <span class="relative size-5 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                    </svg>
+                </span>
+            </summary>
+            <p class="mt-4 text-sm text-[var(--ink-dim)] leading-relaxed font-semibold">
+                Sama sekali tidak. Kami menerapkan SOP ketat <strong>"1 Mesin 1 Pelanggan"</strong> demi menjaga kebersihan maksimal dan mencegah penularan penyakit kulit atau tertukarnya helai pakaian Anda.
+            </p>
+        </details>
+
+        <details class="group bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 [&_summary::-webkit-details-marker]:hidden transition shadow-sm hover:shadow-md cursor-pointer">
+            <summary class="flex items-center justify-between gap-4">
+                <h2 class="text-lg font-bold text-[var(--ink)] tracking-wide">
+                    Bagaimana jika ada pakaian saya yang hilang atau rusak?
+                </h2>
+                <span class="relative size-5 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                    </svg>
+                </span>
+            </summary>
+            <p class="mt-4 text-sm text-[var(--ink-dim)] leading-relaxed font-semibold">
+                Kami mencatat berat pakaian dan detail transaksi Anda dalam sistem digital saat masuk. Namun, jika kelalaian terbukti berada di pihak kami (rusak saat proses atau hilang), kami memberikan ganti rugi maksimal hingga <strong>2 kali dari nilai ongkos cuci</strong> untuk item yang bersangkutan.
+            </p>
+        </details>
+
+        <details class="group bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 [&_summary::-webkit-details-marker]:hidden transition shadow-sm hover:shadow-md cursor-pointer">
+            <summary class="flex items-center justify-between gap-4">
+                <h2 class="text-lg font-bold text-[var(--ink)] tracking-wide">
+                    Apakah ada berat minimal untuk pencucian kiloan?
+                </h2>
+                <span class="relative size-5 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                    </svg>
+                </span>
+            </summary>
+            <p class="mt-4 text-sm text-[var(--ink-dim)] leading-relaxed font-semibold">
+                Ya, berat minimal untuk pemesanan Cuci Kiloan Reguler adalah <strong>3 kg</strong>. Cucian dengan berat di bawah 3 kg tetap akan diproses dalam 1 mesin eksklusif, namun tarif minimum tetap dihitung setara 3 kg (Rp 21.000).
+            </p>
+        </details>
+
+        <details class="group bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 [&_summary::-webkit-details-marker]:hidden transition shadow-sm hover:shadow-md cursor-pointer">
+            <summary class="flex items-center justify-between gap-4">
+                <h2 class="text-lg font-bold text-[var(--ink)] tracking-wide">
+                    Berapa lama estimasi pengerjaan laundry?
+                </h2>
+                <span class="relative size-5 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                    </svg>
+                </span>
+            </summary>
+            <p class="mt-4 text-sm text-[var(--ink-dim)] leading-relaxed font-semibold">
+                Kami menyediakan beberapa pilihan layanan:
+                <br>• <strong>Reguler:</strong> 2 - 3 Hari Kerja
+                <br>• <strong>Express:</strong> 6 - 12 Jam
+                <br>• <strong>Dry Cleaning:</strong> 3 - 5 Hari Kerja
+            </p>
+        </details>
+
+        <details class="group bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 [&_summary::-webkit-details-marker]:hidden transition shadow-sm hover:shadow-md cursor-pointer">
+            <summary class="flex items-center justify-between gap-4">
+                <h2 class="text-lg font-bold text-[var(--ink)] tracking-wide">
+                    Deterjen dan pewangi apa yang digunakan?
+                </h2>
+                <span class="relative size-5 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                    </svg>
+                </span>
+            </summary>
+            <p class="mt-4 text-sm text-[var(--ink-dim)] leading-relaxed font-semibold">
+                Kami menggunakan deterjen premium cair anti-bakteri ramah lingkungan yang mampu mengangkat noda tanpa merusak serat kain. Pewangi kami bersertifikasi premium dan hypoallergenic sehingga aman untuk kulit sensitif dan bayi.
+            </p>
+        </details>
+
+        <details class="group bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 [&_summary::-webkit-details-marker]:hidden transition shadow-sm hover:shadow-md cursor-pointer">
+            <summary class="flex items-center justify-between gap-4">
+                <h2 class="text-lg font-bold text-[var(--ink)] tracking-wide">
+                    Bagaimana metode pembayarannya?
+                </h2>
+                <span class="relative size-5 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-100 group-open:opacity-0 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute inset-0 size-5 opacity-0 group-open:opacity-100 text-[var(--red)] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4" />
+                    </svg>
+                </span>
+            </summary>
+            <p class="mt-4 text-sm text-[var(--ink-dim)] leading-relaxed font-semibold">
+                Kami mendukung pembayaran tunai langsung di kasir outlet, transfer bank (Virtual Account), serta dompet digital (GoPay, OVO, ShopeePay, Dana, LinkAja) menggunakan kode QRIS statis yang tersedia di kasir.
+            </p>
+        </details>
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="mt-16 text-center bg-[var(--red-soft)] border border-[var(--red-glow)] rounded-3xl p-10">
+        <h3 class="text-2xl font-bold text-[var(--ink)] mb-2">Masih Memiliki Pertanyaan?</h3>
+        <p class="text-sm text-[var(--ink-dim)] mb-6 font-semibold">Tim Customer Support kami siap membantu menjawab pertanyaan Anda via WhatsApp.</p>
+        <a href="{% url 'contact' %}" class="inline-block bg-[var(--red)] hover:bg-[var(--red-deep)] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-full transition shadow-md shadow-[var(--red-glow)]">
+            Hubungi Kami
+        </a>
+    </div>
+</div>
+{% endblock %}
