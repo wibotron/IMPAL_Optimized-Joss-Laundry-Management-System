@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Kebijakan Privasi - JOSS Laundry{% endblock %}
+{% block content %}
+<div class="py-16 px-4 max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+        <span class="text-xs font-bold tracking-widest text-[var(--red)] uppercase bg-[var(--red-soft)] px-3 py-1 rounded-full">Bantuan</span>
+        <h1 class="text-5xl font-black mt-4 mb-6 tracking-tight text-[var(--ink)]">KEBIJAKAN PRIVASI</h1>
+        <p class="text-lg text-[var(--ink-dim)] leading-relaxed max-w-2xl mx-auto font-medium">
+            JOSS Laundry sangat menghargai privasi data pribadi Anda. Kami berkomitmen untuk melindungi informasi konsumen yang dipercayakan kepada kami.
+        </p>
+    </div>
+
+    <!-- Content Block -->
+    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-8 md:p-12 shadow-sm space-y-8 text-[var(--ink-dim)] font-semibold leading-relaxed">
+        
+        <div>
+            <h2 class="text-xl font-bold text-[var(--ink)] mb-3 flex items-center gap-3">
+                <span class="text-[var(--red)]">01.</span> Pengumpulan Informasi Pribadi
+            </h2>
+            <p class="text-sm">
+                Saat Anda melakukan pendaftaran akun pelanggan atau menyerahkan cucian di outlet kami, kami mengumpulkan informasi berupa nama lengkap, nomor telepon (WhatsApp), alamat (opsional), serta detail riwayat transaksi laundry Anda.
+            </p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-bold text-[var(--ink)] mb-3 flex items-center gap-3">
+                <span class="text-[var(--red)]">02.</span> Penggunaan Informasi Anda
+            </h2>
+            <p class="text-sm mb-2">Informasi yang kami kumpulkan hanya digunakan untuk:</p>
+            <ul class="list-disc pl-6 space-y-2 text-sm">
+                <li>Mengirimkan notifikasi WhatsApp otomatis mengenai perubahan status laundry Anda (misal: "Cucian Selesai").</li>
+                <li>Menghubungkan Anda ke halaman nota digital yang berisi rincian timbangan dan harga transaksi secara aman.</li>
+                <li>Menyediakan dasbor pelanggan tempat Anda memantau seluruh riwayat transaksi laundry sebelumnya.</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-bold text-[var(--ink)] mb-3 flex items-center gap-3">
+                <span class="text-[var(--red)]">03.</span> Jaminan Keamanan Data
+            </h2>
+            <p class="text-sm">
+                Kami menerapkan prosedur enkripsi database untuk mencegah akses ilegal atau kebocoran data pelanggan. Data transaksi Anda disimpan dengan aman di server lokal kami yang dilindungi oleh firewall internal.
+            </p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-bold text-[var(--ink)] mb-3 flex items-center gap-3">
+                <span class="text-[var(--red)]">04.</span> Kebijakan Anti-Spam & Distribusi
+            </h2>
+            <p class="text-sm">
+                JOSS Laundry berkomitmen penuh untuk <strong>tidak pernah menjual, menyewakan, atau mendistribusikan database nomor HP Anda</strong> kepada pihak ketiga mana pun untuk kepentingan promosi iklan komersial. Kami sangat membenci spam.
+            </p>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-bold text-[var(--ink)] mb-3 flex items-center gap-3">
+                <span class="text-[var(--red)]">05.</span> Hak Akses & Perubahan Data
+            </h2>
+            <p class="text-sm">
+                Pelanggan memiliki hak penuh untuk mengubah data profil (nama, nomor HP, password) melalui dasbor akun pelanggan atau meminta petugas kasir kami untuk memperbaruinya di kasir outlet.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Date modified -->
+    <p class="text-center text-xs text-[var(--muted)] mt-8 font-medium">Terakhir diperbarui: Juni 2026</p>
+</div>
+{% endblock %}
