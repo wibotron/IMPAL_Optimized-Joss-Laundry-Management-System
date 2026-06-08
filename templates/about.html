@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% block title %}Tentang Kami - JOSS Laundry{% endblock %}
+{% block content %}
+<style>
+    .about-hero {
+        background: radial-gradient(circle at 10% 20%, rgba(200, 37, 31, 0.03) 0%, rgba(250, 247, 244, 0) 90%);
+        position: relative;
+    }
+
+    .premium-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .premium-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 36px rgba(26, 26, 26, 0.05);
+        border-color: rgba(200, 37, 31, 0.15);
+    }
+
+    .stat-badge {
+        font-family: 'Bebas Neue', sans-serif;
+        letter-spacing: 0.05em;
+    }
+
+    /* SOP Step lines */
+    .step-line::after {
+        content: '';
+        position: absolute;
+        top: 24px;
+        left: 56px;
+        width: calc(100% - 32px);
+        height: 2px;
+        background: repeating-linear-gradient(90deg, var(--border), var(--border) 6px, transparent 6px, transparent 12px);
+        z-index: 0;
+    }
+
+    @media (max-width: 1024px) {
+        .step-line::after {
+            display: none;
+        }
+    }
+</style>
+
+<div class="about-hero overflow-hidden pb-12">
+    <!-- Hero Header -->
+    <div class="py-20 px-4 max-w-7xl mx-auto text-center relative z-10">
+        <span
+            class="text-xs font-bold tracking-widest text-[var(--red)] uppercase bg-[var(--red-soft)] px-4 py-2 rounded-full">Tentang
+            Kami</span>
+        <h1 class="text-5xl md:text-7xl font-black mt-6 mb-6 tracking-tight text-[var(--ink)] uppercase leading-none">
+            REVOLUSI LAUNDRY<br><span class="text-[var(--red)]">MODERN & HIGIENIS</span>
+        </h1>
+        <p class="text-lg md:text-xl text-[var(--ink-dim)] leading-relaxed max-w-3xl mx-auto font-medium">
+            JOSS Laundry hadir sebagai pelopor laundry walk-in premium di Bojongsoang yang mengintegrasikan mesin cuci
+            mutakhir, air hasil filtrasi, dan sistem pelacakan digital terpercaya.
+        </p>
+    </div>
+
+    <!-- Quick Stats Grid (Plugs whitespace and displays key info) -->
+    <div class="max-w-7xl mx-auto px-4 mb-20">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)] shadow-sm text-center">
+                <span class="stat-badge text-4xl font-extrabold text-[var(--red)] block">500+</span>
+                <span class="text-xs text-[var(--ink-dim)] uppercase font-bold tracking-wider">Pelanggan Aktif</span>
+            </div>
+            <div class="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)] shadow-sm text-center">
+                <span class="stat-badge text-4xl font-extrabold text-[var(--red)] block">10K+</span>
+                <span class="text-xs text-[var(--ink-dim)] uppercase font-bold tracking-wider">Kg Pakaian
+                    Diproses</span>
+            </div>
+            <div class="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)] shadow-sm text-center">
+                <span class="stat-badge text-4xl font-extrabold text-[var(--red)] block">99.8%</span>
+                <span class="text-xs text-[var(--ink-dim)] uppercase font-bold tracking-wider">Tingkat Kepuasan</span>
+            </div>
+            <div class="bg-[var(--surface)] p-6 rounded-2xl border border-[var(--border)] shadow-sm text-center">
+                <span class="stat-badge text-4xl font-extrabold text-[var(--red)] block">1 MESIN</span>
+                <span class="text-xs text-[var(--ink-dim)] uppercase font-bold tracking-wider">Eksklusif Per User</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Panel: Two Columns -->
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-24">
+        <!-- Visual Presentation / Left column (5 cols) -->
+        <div class="lg:col-span-5 relative">
+            <div
+                class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-[var(--red)] to-amber-500 opacity-20 blur-xl">
+            </div>
+            <div class="relative bg-gradient-to-br from-[#C8251F] to-[#8B1915] text-white rounded-3xl p-8 shadow-xl">
+                <h3 class="text-2xl font-black mb-4 tracking-wide uppercase"
+                    style="font-family: 'Bebas Neue', sans-serif;">Pakaian Anda Adalah Prioritas Kami</h3>
+                <div class="space-y-4 text-xs font-semibold leading-relaxed text-red-100/90">
+                    <p class="flex items-center gap-3">
+                        <span class="text-lg">💧</span>
+                        <span>Filtrasi Air Ganda untuk Menjaga Warna Kain</span>
+                    </p>
+                    <p class="flex items-center gap-3">
+                        <span class="text-lg">🛡️</span>
+                        <span>SOP 1 Pelanggan 1 Mesin (Anti-Campur)</span>
+                    </p>
+                    <p class="flex items-center gap-3">
+                        <span class="text-lg">✨</span>
+                        <span>Deterjen Premium Ramah Serat & Kulit</span>
+                    </p>
+                    <p class="flex items-center gap-3">
+                        <span class="text-lg">📋</span>
+                        <span>Pelacakan Status Pesanan via Dasbor Digital</span>
+                    </p>
+                </div>
+                <div class="mt-8 pt-6 border-t border-white/10 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center font-bold text-lg text-white">
+                        J</div>
+                    <div>
+                        <h4 class="font-extrabold text-sm tracking-wide">JOSS LAUNDRY</h4>
+                        <p class="text-[10px] uppercase font-bold tracking-widest text-red-200">Bojongsoang, Bandung</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text / Right column (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+            <h2 class="text-3xl font-black text-[var(--ink)] tracking-tight uppercase">Komitmen Layanan Terbaik</h2>
+            <div class="space-y-4 text-sm text-[var(--ink-dim)] font-semibold leading-relaxed">
+                <p>
+                    Didirikan dengan tekad untuk merevolusi layanan laundry retail konvensional, JOSS Laundry melayani
+                    pelanggan di kawasan Bojongsoang, Bandung dengan standar higienitas tertinggi. Kami sangat memahami
+                    kekhawatiran Anda terkait pakaian tertukar, rusak, atau dicampur dengan pakaian orang lain.
+                </p>
+                <p>
+                    Di JOSS Laundry, kami memastikan setiap pakaian Anda dicuci secara terpisah menggunakan satu mesin
+                    khusus per transaksi pelanggan. Didukung oleh air bersih hasil filtrasi ganda bebas kandungan zat
+                    besi serta setrika uap modern, warna dan kelembutan pakaian Anda akan terjaga sempurna.
+                </p>
+            </div>
+            <div class="pt-2 flex gap-4">
+                <a href="{% url 'landing' %}#pricing"
+                    class="px-6 py-3 bg-[var(--red)] hover:bg-[var(--red-deep)] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-md shadow-[var(--red-glow)]">
+                    Lihat Paket Harga
+                </a>
+                <a href="{% url 'contact' %}"
+                    class="px-6 py-3 bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--ink)] text-xs font-bold uppercase tracking-wider rounded-xl border border-[var(--border)] transition">
+                    Hubungi Kami
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOP Higienis (Visual Steps - Fills whitespace beautifully) -->
+    <div class="bg-[var(--surface-2)] border-y border-[var(--border)] py-16 px-4 mb-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span
+                    class="text-xs font-bold tracking-widest text-[var(--red)] uppercase bg-[var(--red-soft)] px-3 py-1 rounded-full">Alur
+                    Kerja</span>
+                <h2 class="text-3xl font-black mt-3 text-[var(--ink)] uppercase tracking-tight">SOP OPERASIONAL HIGIENIS
+                    KAMI</h2>
+                <p class="text-xs text-[var(--ink-dim)] font-semibold mt-2 leading-relaxed">
+                    Setiap helai pakaian Anda melalui proses pengecekan dan sterilisasi ketat di bawah pengawasan kasir
+                    dan staf berpengalaman.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 relative">
+                <!-- Step 1 -->
+                <div class="relative flex flex-col items-center text-center group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-[var(--red)] text-white flex items-center justify-center font-bold text-sm shadow-md mb-4 group-hover:scale-110 transition relative z-10">
+                        01</div>
+                    <h3 class="font-bold text-sm text-[var(--ink)] mb-2">Penerimaan & Sortir</h3>
+                    <p class="text-xs text-[var(--ink-dim)] font-semibold leading-relaxed px-4">Pakaian ditimbang, dicek
+                        noda khusus, dan dicatat dalam sistem kasir.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="relative flex flex-col items-center text-center group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-[var(--red)] text-white flex items-center justify-center font-bold text-sm shadow-md mb-4 group-hover:scale-110 transition relative z-10">
+                        02</div>
+                    <h3 class="font-bold text-sm text-[var(--ink)] mb-2">Cuci Eksklusif</h3>
+                    <p class="text-xs text-[var(--ink-dim)] font-semibold leading-relaxed px-4">Pencucian eksklusif 1
+                        pelanggan 1 mesin dengan air steril tersaring.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="relative flex flex-col items-center text-center group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-[var(--red)] text-white flex items-center justify-center font-bold text-sm shadow-md mb-4 group-hover:scale-110 transition relative z-10">
+                        03</div>
+                    <h3 class="font-bold text-sm text-[var(--ink)] mb-2">Pengeringan Mesin</h3>
+                    <p class="text-xs text-[var(--ink-dim)] font-semibold leading-relaxed px-4">Dikeringkan dengan
+                        pengering gas suhu tinggi agar bebas bakteri & debu.</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="relative flex flex-col items-center text-center group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-[var(--red)] text-white flex items-center justify-center font-bold text-sm shadow-md mb-4 group-hover:scale-110 transition relative z-10">
+                        04</div>
+                    <h3 class="font-bold text-sm text-[var(--ink)] mb-2">Setrika Uap</h3>
+                    <p class="text-xs text-[var(--ink-dim)] font-semibold leading-relaxed px-4">Disetrika menggunakan
+                        setrika uap industri agar halus tanpa gosong.</p>
+                </div>
+                <!-- Step 5 -->
+                <div class="relative flex flex-col items-center text-center group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-[var(--red)] text-white flex items-center justify-center font-bold text-sm shadow-md mb-4 group-hover:scale-110 transition relative z-10">
+                        05</div>
+                    <h3 class="font-bold text-sm text-[var(--ink)] mb-2">QC & Packing</h3>
+                    <p class="text-xs text-[var(--ink-dim)] font-semibold leading-relaxed px-4">Pemberian parfum premium
+                        tahan lama dan segel plastik higienis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vision and Mission Split Cards -->
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <div class="premium-card p-8 md:p-10 rounded-3xl shadow-sm">
+            <span class="text-3xl block mb-4">🎯</span>
+            <h2 class="text-2xl font-bold text-[var(--ink)] mb-4 uppercase tracking-wide">Visi JOSS Laundry</h2>
+            <p class="text-sm text-[var(--ink-dim)] font-semibold leading-relaxed">
+                Menjadi penyedia layanan laundry walk-in nomor satu di Bandung yang mengedepankan transparansi
+                operasional melalui sistem digital, kecepatan layanan express, serta higienitas tanpa kompromi demi
+                kenyamanan hidup para pelanggan kami.
+            </p>
+        </div>
+
+        <div class="premium-card p-8 md:p-10 rounded-3xl shadow-sm">
+            <span class="text-3xl block mb-4">🚀</span>
+            <h2 class="text-2xl font-bold text-[var(--ink)] mb-4 uppercase tracking-wide">Misi JOSS Laundry</h2>
+            <ul class="space-y-3 text-sm text-[var(--ink-dim)] font-semibold">
+                <li class="flex items-start gap-3">
+                    <span class="text-[var(--red)] font-bold">✓</span>
+                    <span>Menjamin sterilisasi cucian melalui larangan pencampuran antar-pelanggan.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-[var(--red)] font-bold">✓</span>
+                    <span>Menawarkan kemudahan pelacakan nota digital secara transparan.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-[var(--red)] font-bold">✓</span>
+                    <span>Memberikan harga terjangkau dengan kualitas pengerjaan premium yang wangi dan rapi.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
