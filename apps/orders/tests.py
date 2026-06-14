@@ -126,3 +126,40 @@ class ProcessOrderClaimTest(TestCase):
                 phone_number="081234567"
             )
 
+class GenerateOrderCodeTest(TestCase):
+
+    def setUp(self):
+        self.paket = LaundryPackage.objects.create(
+            name="Cuci Reguler",
+            price_per_kg=5000,
+            estimated_days=2,
+        )
+        self.today_str = datetime.date.today().strftime('%Y%m%d')
+
+    def test_generate_order_code_first_order(self):
+        kode = generate_order_code()
+        self.assertEqual(kode, f"JOSS-{self.today_str}-0001")
+
+    def test_generate_order_code_increment(self):
+        Order.objects.create(
+            nama_customer="Saut Tulus",
+            nomor_hp="081234567",
+            paket=self.paket,
+            berat=2,
+            progress_status="DITERIMA",
+        )
+        kode = generate_order_code()
+        self.assertEqual(kode, f"JOSS-{self.today_str}-0002")
+
+    def test_generate_order_code_multiple_orders(self):
+        for _ in range(3):
+            Order.objects.create(
+                nama_customer="Saut Tulus",
+                nomor_hp="081234567",
+                paket=self.paket,
+                berat=2,
+                progress_status="DITERIMA",
+            )
+        kode = generate_order_code()
+        self.assertEqual(kode, f"JOSS-{self.today_str}-0004")
+
