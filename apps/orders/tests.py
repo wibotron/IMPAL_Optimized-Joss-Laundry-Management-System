@@ -224,3 +224,34 @@ class GetNotificationMsgReadyTest(TestCase):
         self.assertIn("https://wa.me/6281234567890", link)
         self.assertIn(self.order.kode_nota, link)
 
+class GenerateNotaPdfTest(TestCase):
+
+    def setUp(self):
+        self.paket = LaundryPackage.objects.create(
+            name="Cuci Reguler",
+            price_per_kg=5000,
+            estimated_days=2,
+        )
+        self.order = Order.objects.create(
+            nama_customer="Saut Tulus",
+            nomor_hp="081234567890",
+            paket=self.paket,
+            berat=2,
+            progress_status="DITERIMA",
+        )
+
+    def test_generate_nota_pdf_creates_file(self):
+        try:
+            url = generate_nota_pdf(self.order)
+        except ImportError:
+            self.skipTest("WeasyPrint tidak terinstall di environment ini, test dilewati.")
+
+        self.order.refresh_from_db()
+        self.assertTrue(self.order.nota_pdf)
+        self.assertIn("nota_", self.order.nota_pdf.name)
+        self.assertIn(".pdf", self.order.nota_pdf.name)
+        self.assertEqual(url, self.order.nota_pdf.url)
+
+    def tearDown(self):
+        if self.order.nota_pdf:
+            self.order.nota_pdf.delete(save=False)
