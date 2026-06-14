@@ -181,3 +181,24 @@ class GetWhatsappShareLinkTest(TestCase):
         link = get_whatsapp_share_link("abc", "Halo")
         self.assertEqual(link, "#")
 
+class GetNotificationMsgReceivedTest(TestCase):
+
+    def setUp(self):
+        self.paket = LaundryPackage.objects.create(
+            name="Cuci Reguler",
+            price_per_kg=5000,
+            estimated_days=2,
+        )
+        self.order = Order.objects.create(
+            nama_customer="Saut Tulus",
+            nomor_hp="081234567890",
+            paket=self.paket,
+            berat=2,
+            progress_status="DITERIMA",
+        )
+
+    def test_notification_received_contains_phone_and_kode_nota(self):
+        link = get_notification_msg_received(self.order)
+        self.assertIn("https://wa.me/6281234567890", link)
+        self.assertIn(self.order.kode_nota, link)
+
