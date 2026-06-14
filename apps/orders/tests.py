@@ -202,3 +202,25 @@ class GetNotificationMsgReceivedTest(TestCase):
         self.assertIn("https://wa.me/6281234567890", link)
         self.assertIn(self.order.kode_nota, link)
 
+class GetNotificationMsgReadyTest(TestCase):
+
+    def setUp(self):
+        self.paket = LaundryPackage.objects.create(
+            name="Cuci Reguler",
+            price_per_kg=5000,
+            estimated_days=2,
+        )
+        self.order = Order.objects.create(
+            nama_customer="Saut Tulus",
+            nomor_hp="081234567890",
+            paket=self.paket,
+            berat=2,
+            progress_status="SELESAI",
+            payment_status="PAID",
+        )
+
+    def test_notification_ready_contains_phone_and_kode_nota(self):
+        link = get_notification_msg_ready(self.order)
+        self.assertIn("https://wa.me/6281234567890", link)
+        self.assertIn(self.order.kode_nota, link)
+
