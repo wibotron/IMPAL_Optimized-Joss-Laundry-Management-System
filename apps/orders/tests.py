@@ -163,3 +163,21 @@ class GenerateOrderCodeTest(TestCase):
         kode = generate_order_code()
         self.assertEqual(kode, f"JOSS-{self.today_str}-0004")
 
+class GetWhatsappShareLinkTest(TestCase):
+
+    def test_link_with_leading_zero(self):
+        link = get_whatsapp_share_link("081234567890", "Halo")
+        self.assertEqual(link, "https://wa.me/6281234567890?text=Halo")
+
+    def test_link_with_plus62_prefix(self):
+        link = get_whatsapp_share_link("+6281234567890", "Halo")
+        self.assertEqual(link, "https://wa.me/6281234567890?text=Halo")
+
+    def test_link_with_dashes_and_encoded_message(self):
+        link = get_whatsapp_share_link("0812-3456-7890", "Tes Pesan")
+        self.assertEqual(link, "https://wa.me/6281234567890?text=Tes%20Pesan")
+
+    def test_link_with_invalid_phone(self):
+        link = get_whatsapp_share_link("abc", "Halo")
+        self.assertEqual(link, "#")
+
