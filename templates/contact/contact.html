@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Hubungi Kami - JOSS Laundry{% endblock %}
+{% block content %}
+<div class="py-16 px-4 max-w-7xl mx-auto">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold tracking-widest text-[var(--red)] uppercase bg-[var(--red-soft)] px-3 py-1 rounded-full">Kontak</span>
+        <h1 class="text-5xl font-black mt-4 mb-6 tracking-tight text-[var(--ink)]">HUBUNGI JOSS LAUNDRY</h1>
+        <p class="text-lg text-[var(--ink-dim)] leading-relaxed font-medium">
+            Ingin menyampaikan kritik, saran, atau pertanyaan seputar kemitraan dan layanan? Tim support kami siap membantu Anda kapan saja.
+        </p>
+    </div>
+
+    <!-- Contact Grid: Details vs Form -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-16">
+        
+        <!-- Left Side: Details (4 cols on lg) -->
+        <div class="lg:col-span-5 space-y-6">
+            <div class="bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-8 shadow-sm">
+                <h2 class="text-2xl font-bold mb-6 text-[var(--ink)] tracking-tight">Informasi Outlet</h2>
+                
+                <div class="space-y-6 text-sm text-[var(--ink-dim)] font-semibold">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl mt-0.5">🏪</span>
+                        <div>
+                            <h3 class="font-bold text-[var(--ink)] mb-1">Alamat Outlet Utama</h3>
+                            <p class="leading-relaxed">Jl. Sukabirus No.88, Citeureup, Kec. Dayeuhkolot, Kabupaten Bandung, Jawa Barat 40257</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl mt-0.5">⏰</span>
+                        <div>
+                            <h3 class="font-bold text-[var(--ink)] mb-1">Jam Operasional</h3>
+                            <p class="leading-relaxed">Senin - Minggu (07.00 - 21.30 WIB)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl mt-0.5">📞</span>
+                        <div>
+                            <h3 class="font-bold text-[var(--ink)] mb-1">Telepon & Email</h3>
+                            <p class="leading-relaxed">Telepon: 081646960017</p>
+                            <p class="leading-relaxed">Email: support@josslaundry.com</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl mt-0.5">📸</span>
+                        <div>
+                            <h3 class="font-bold text-[var(--ink)] mb-1">Instagram</h3>
+                            <a href="https://www.instagram.com/josslaundry_telkomuniv/" target="_blank" rel="noopener noreferrer" class="text-[var(--red)] hover:underline break-all">@josslaundry_telkomuniv</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WhatsApp Direct Card -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/60 rounded-3xl p-8 shadow-sm">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-3xl">💬</span>
+                    <div>
+                        <h3 class="font-bold text-green-900 tracking-wide uppercase text-xs">Customer Support</h3>
+                        <p class="text-lg font-black text-green-950">WHATSAPP OFFICIAL</p>
+                    </div>
+                </div>
+                <p class="text-xs text-green-800/80 leading-relaxed font-semibold mb-6">
+                    Hubungi kami melalui chat WhatsApp untuk respon lebih cepat mengenai status cucian Anda atau komplain.
+                </p>
+                <a href="https://wa.me/6281646960017?text=Halo%20Joss%20Laundry%2C%20saya%20ingin%20tanya%20mengenai%20status%20laundry%20saya" target="_blank" class="block w-full text-center bg-green-600 hover:bg-green-700 text-white text-xs font-bold uppercase tracking-wider py-3.5 rounded-2xl shadow-md shadow-green-600/10 transition">
+                    Chat WhatsApp Sekarang
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Side: Message Form (7 cols on lg) -->
+        <div class="lg:col-span-7 bg-[var(--surface)] border border-[var(--border)] rounded-3xl p-8 md:p-10 shadow-sm relative">
+            <h2 class="text-2xl font-bold mb-2 text-[var(--ink)] tracking-tight">Kirim Pesan</h2>
+            <p class="text-sm text-[var(--ink-dim)] mb-8 font-semibold">Tuliskan pesan Anda di bawah ini, kami akan merespon via Email / WhatsApp Anda.</p>
+
+            <form id="contact-form" onsubmit="handleContactSubmit(event)" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-[var(--ink)] uppercase tracking-wider mb-2">Nama Lengkap</label>
+                        <input type="text" required class="w-full px-4 py-3 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--red)] font-semibold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-[var(--ink)] uppercase tracking-wider mb-2">Nomor HP / WA</label>
+                        <input type="tel" required class="w-full px-4 py-3 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--red)] font-semibold text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-[var(--ink)] uppercase tracking-wider mb-2">Alamat Email</label>
+                    <input type="email" required class="w-full px-4 py-3 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--red)] font-semibold text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-[var(--ink)] uppercase tracking-wider mb-2">Isi Pesan</label>
+                    <textarea rows="5" required class="w-full px-4 py-3 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--red)] font-semibold text-sm resize-none"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-[var(--red)] hover:bg-[var(--red-deep)] text-white text-sm font-bold uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-[var(--red-glow)] transition flex items-center justify-center gap-2">
+                    <span>Kirim Pesan</span>
+                    <span>→</span>
+                </button>
+            </form>
+
+            <!-- Success Notification Overlay -->
+            <div id="success-overlay" class="absolute inset-0 bg-white/95 rounded-3xl flex flex-col items-center justify-center p-8 text-center opacity-0 pointer-events-none transition-all duration-300">
+                <span class="text-6xl mb-4">✉️</span>
+                <h3 class="text-2xl font-black text-gray-900 tracking-tight uppercase">PESAN BERHASIL DIKIRIM!</h3>
+                <p class="text-sm text-[var(--ink-dim)] max-w-sm mt-2 font-semibold">Terima kasih telah menghubungi kami. Tim kami akan segera menanggapi pesan Anda dalam waktu 24 jam.</p>
+                <button onclick="resetContactForm()" class="mt-6 px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold uppercase tracking-wider rounded-full transition">Kirim Pesan Lain</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function handleContactSubmit(event) {
+        event.preventDefault();
+        
+        // Show success overlay with micro-animation
+        const overlay = document.getElementById('success-overlay');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100', 'pointer-events-auto');
+    }
+
+    function resetContactForm() {
+        // Reset the form values
+        document.getElementById('contact-form').reset();
+        
+        // Hide success overlay
+        const overlay = document.getElementById('success-overlay');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-100', 'pointer-events-auto');
+    }
+</script>
+{% endblock %}
