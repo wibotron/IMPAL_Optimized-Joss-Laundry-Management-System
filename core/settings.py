@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.laundry_package",
     "apps.orders",
     "apps.reports",
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    'apps.orders.middleware.CurrentUserMiddleware',
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -112,6 +114,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

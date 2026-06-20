@@ -25,7 +25,7 @@ class Command(BaseCommand):
                 defaults={
                     'price_per_kg': pkg['price_per_kg'],
                     'estimated_days': pkg['estimated_days'],
-                    'is_active': True,
+                    'is_active': False,
                     # start_date, end_date, description biarkan default (null/blank)
                 }
             )

@@ -4,6 +4,9 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import RegexValidator, MinValueValidator
 from apps.laundry_package.models import LaundryPackage
+from .middleware import get_current_user
+from datetime import timedelta
+from django.utils import timezone
 
 class Order(models.Model):
     PROGRESS_CHOICES = [
@@ -58,8 +61,23 @@ class Order(models.Model):
         return generate_order_code()
 
     def save(self, *args, **kwargs):
+        # Bersihkan nomor hp
         if self.nomor_hp:
             self.nomor_hp = self.nomor_hp.replace(" ", "").replace("-", "")
+
+        # Deteksi perubahan status (hanya jika instance sudah ada di db)
+        if self.pk:
+            try:
+                old = Order.objects.get(pk=self.pk)
+                if old.progress_status != self.progress_status:
+                    user = get_current_user()
+                    ProgressLog.objects.create(
+                        order=self,
+                        status=self.progress_status,
+                        changed_by=user
+                    )
+            except Order.DoesNotExist:
+                pass
 
         if not self.kode_nota:
             self.kode_nota = self.generate_kode_nota()
@@ -75,6 +93,22 @@ class Order(models.Model):
                 self.total_harga = self.berat * self.paket.price_per_kg
                 
         super().save(*args, **kwargs)
+
+    def estimated_completion_date(self):
+        """Menghitung perkiraan tanggal selesai berdasarkan status dan estimasi paket"""
+        if self.progress_status in ['SELESAI', 'DIAMBIL']:
+            # Jika sudah selesai/diambil, gunakan tanggal update terakhir
+            return self.tanggal_update.date()
+        # Jika masih dalam proses, gunakan tanggal order + estimasi hari paket
+        return self.tanggal_order.date() + timedelta(days=self.paket.estimated_days)
+
+    def days_remaining(self):
+        """Menghitung sisa hari hingga perkiraan selesai"""
+        if self.progress_status in ['SELESAI', 'DIAMBIL']:
+            return 0
+        today = timezone.now().date()
+        delta = (self.estimated_completion_date() - today).days
+        return max(delta, 0)  # tidak negatif
 
     def __str__(self):
         return f"{self.kode_nota} - {self.nama_customer}"
@@ -93,3 +127,17 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"Feedback {self.order.kode_nota} - rating {self.rating}"
+
+class ProgressLog(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='progress_logs')
+    status = models.CharField(max_length=20, choices=Order.PROGRESS_CHOICES)
+    changed_at = models.DateTimeField(auto_now_add=True)
+    changed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        ordering = ['changed_at']
+        verbose_name = "Log Perubahan Status"
+        verbose_name_plural = "Log Perubahan Status"
+
+    def __str__(self):
+        return f"{self.order.kode_nota} - {self.get_status_display()} pada {self.changed_at.strftime('%d/%m/%Y %H:%M')}"

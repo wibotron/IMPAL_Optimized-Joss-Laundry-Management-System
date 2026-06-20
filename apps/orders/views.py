@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-
+from datetime import datetime
 from apps.accounts.decorators import owner_or_karyawan_required, customer_required
 
 from .models import Order, Feedback
@@ -21,12 +21,27 @@ from .services import (
 
 
 # ==================== KARYAWAN / OWNER ====================
-
 @owner_or_karyawan_required
 def order_list_karyawan(request):
-    """Daftar semua order untuk karyawan/owner, dengan filter dan search"""
-    orders = Order.objects.select_related('paket', 'customer').all()
+    orders = Order.objects.select_related('paket', 'customer').prefetch_related('progress_logs').all()
 
+    # Filter tanggal
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            orders = orders.filter(tanggal_order__date__gte=start_date_obj)
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+            orders = orders.filter(tanggal_order__date__lte=end_date_obj)
+        except ValueError:
+            pass
+
+    # Filter search, progress, payment (kode yang sudah ada)
     search = request.GET.get('search', '')
     if search:
         orders = orders.filter(Q(kode_nota__icontains=search) | Q(nama_customer__icontains=search))
@@ -49,6 +64,8 @@ def order_list_karyawan(request):
         'selected_payment': payment,
         'search_query': search,
         'wa_link': wa_link,
+        'start_date': start_date if start_date else '',
+        'end_date': end_date if end_date else '',
     }
     return render(request, 'orders/order_list_karyawan.html', context)
 
@@ -175,7 +192,7 @@ def claim_order(request):
 @customer_required
 def customer_dashboard(request):
     """Dashboard customer: daftar pesanan yang sudah diklaim, dengan filter"""
-    orders = request.user.orders.all().order_by('-tanggal_order')
+    orders = request.user.orders.all().prefetch_related('progress_logs').order_by('-tanggal_order')
     progress = request.GET.get('progress', '')
     payment = request.GET.get('payment', '')
     if progress:
