@@ -14,6 +14,7 @@ cryptography==49.0.0
 cssselect2==0.9.0
 cycler==0.12.1
 dill==0.4.1
+dj-database-url==3.1.2
 Django==5.2.13
 django-environ==0.13.0
 djangorestframework==3.17.1
@@ -62,6 +63,7 @@ pypdf==6.13.3
 pyphen==0.17.2
 python-bidi==0.6.10
 python-dateutil==2.9.0.post0
+python-decouple==3.8
 PyYAML==6.0.3
 radon==6.0.1
 regex==2026.5.9
