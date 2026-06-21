@@ -8,8 +8,6 @@ Mengatur:
 - Generate PDF nota menggunakan WeasyPrint
 """
 import datetime
-import os
-import tempfile
 from urllib.parse import quote
 from django.core.exceptions import ValidationError
 from django.template.loader import get_template
@@ -97,25 +95,24 @@ def process_order_claim(user, kode_nota: str, phone_number: str) -> Order:
     return order
 
 def generate_nota_pdf(order: Order) -> str:
-    """Generate PDF nota laundry menggunakan WeasyPrint dan simpan ke field nota_pdf"""
-    try:
-        from weasyprint import HTML, CSS
-    except ImportError:
-        raise ImportError("WeasyPrint tidak terinstall. Jalankan: pip install weasyprint")
-
+    """Generate PDF nota menggunakan xhtml2pdf (pure Python, tanpa library sistem)"""
+    from django.http import HttpResponse
+    from django.template.loader import get_template
+    from xhtml2pdf import pisa
+    import io
+    
     template = get_template('orders/nota_pdf.html')
     html_string = template.render({'order': order})
-
-    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
-        HTML(string=html_string).write_pdf(
-            tmp_file,
-            stylesheets=[CSS(string='@page { size: A4; margin: 1.5cm; }')]
-        )
-        tmp_file_path = tmp_file.name
-
-    with open(tmp_file_path, 'rb') as f:
-        filename = f"nota_{order.kode_nota}.pdf"
-        order.nota_pdf.save(filename, ContentFile(f.read()), save=True)
-
-    os.unlink(tmp_file_path)
+    
+    # Simpan PDF ke buffer memory
+    pdf_buffer = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=pdf_buffer)
+    
+    if pisa_status.err:
+        raise Exception(f'Gagal generate PDF: {pisa_status.err}')
+    
+    # Simpan ke field nota_pdf
+    filename = f"nota_{order.kode_nota}.pdf"
+    order.nota_pdf.save(filename, ContentFile(pdf_buffer.getvalue()), save=True)
+    
     return order.nota_pdf.url
